@@ -12,7 +12,7 @@ curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o 
 echo "Downloading neovim config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/init.lua -o %DESTDIR%\neovim\share\nvim\runtime\lua\devenv_config.lua
 echo "Downloading fd ignore file..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/devenv/.fd-ignore -o %DESTDIR%\neovim\share\nvim\.fd-ignore
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o %DESTDIR%\neovim\share\nvim\.fd-ignore
 echo "Downloading clangd..."
 curl -sL https://github.com/clangd/clangd/releases/download/13.0.0/clangd-windows-13.0.0.zip | tar xf - --strip-components=1 -C %DESTDIR%
 echo "Downloading clangd indexer..."
