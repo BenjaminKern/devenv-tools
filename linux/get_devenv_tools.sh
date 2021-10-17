@@ -71,9 +71,9 @@ chmod u+x $DESTDIR/bin/ttyd
 echo "Downloading fzf.keybindings.bash..."
 curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash -o $DESTDIR/config/fzf-key-bindings.bash
 echo "Downloading fd ignore file..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/devenv/.fd-ignore -o $DESTDIR/share/nvim/.fd-ignore
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o $DESTDIR/share/nvim/.fd-ignore
 echo "Downloading devenv_tools.bash..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/devenv/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
 echo "Downloading starship.toml..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
 yarn config set global-folder $DESTDIR/config/yarn/global
