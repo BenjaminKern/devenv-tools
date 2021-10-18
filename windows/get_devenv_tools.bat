@@ -14,10 +14,10 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nv
 echo "Downloading fd ignore file..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o %DESTDIR%\neovim\share\nvim\.fd-ignore
 echo "Downloading clangd..."
-curl -sL https://github.com/clangd/clangd/releases/download/13.0.0/clangd-windows-13.0.0.zip
+curl -sLO https://github.com/clangd/clangd/releases/download/13.0.0/clangd-windows-13.0.0.zip
 tar xf clangd-windows-13.0.0.zip --strip-components=1 -C %DESTDIR%
 echo "Downloading clangd indexer..."
-curl -sL https://github.com/clangd/clangd/releases/download/13.0.0/clangd_indexing_tools-windows-13.0.0.zip
+curl -sLO https://github.com/clangd/clangd/releases/download/13.0.0/clangd_indexing_tools-windows-13.0.0.zip
 tar xf clangd_indexing_tools-windows-13.0.0.zip --strip-components=1 -C %DESTDIR%
 echo "Downloading ripgrep..."
 curl -sL https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-pc-windows-msvc.zip | tar xf - --strip-components=1 -C %DESTDIR%\bin
