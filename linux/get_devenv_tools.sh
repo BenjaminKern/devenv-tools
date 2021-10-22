@@ -68,6 +68,9 @@ curl -sL https://github.com/dandavison/delta/releases/download/0.8.3/delta-0.8.3
 echo "Downloading ttyd..."
 curl -sL https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64 -o $DESTDIR/bin/ttyd
 chmod u+x $DESTDIR/bin/ttyd
+echo "Downloading stylua..."
+curl -sL https://github.com/JohnnyMorganz/StyLua/releases/download/v0.11.0/stylua-0.11.0-linux.zip | bsdtar xf - $DESTDIR/bin
+chmod u+x $DESTDIR/bin/stylua
 echo "Downloading fzf.keybindings.bash..."
 curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash -o $DESTDIR/config/fzf-key-bindings.bash
 echo "Downloading fd ignore file..."
