@@ -22,7 +22,7 @@ alias cat='bat --paging=never'
 
 source $devenv_tools_dir/bin/autocomplete/bat.bash
 source $devenv_tools_dir/bin/autocomplete/fd.bash-completion
-source $devenv_tools_dir/bin/autocomplete/hyperfine.bash-completion
+source $devenv_tools_dir/bin/autocomplete/hyperfine.bash
 source $devenv_tools_dir/bin/autocomplete/lsd.bash-completion
 source $devenv_tools_dir/bin/complete/rg.bash
 source $devenv_tools_dir/bin/completion/btm.bash
