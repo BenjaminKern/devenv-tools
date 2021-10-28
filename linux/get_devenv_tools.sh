@@ -79,6 +79,8 @@ echo "Downloading devenv_tools.bash..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
 echo "Downloading starship.toml..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
+echo "Downloading watchexec..."
+curl -sL https://github.com/watchexec/watchexec/releases/download/cli-v1.17.1/watchexec-1.17.1-x86_64-unknown-linux-musl.tar.xz | bsdtar xfJ - --strip-components=1 -C $DESTDIR/bin
 yarn config set global-folder $DESTDIR/config/yarn/global
 echo "Installing pyright"
 yarn global add pyright --prefix $DESTDIR
