@@ -1,7 +1,7 @@
 devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 ! [[ -f $devenv_tools_dir/devenv_tools.bash ]] && return
 
-PATH=$devenv_tools_dir/bin:$devenv_tools_dir/git-fuzzy/bin:$PATH
+PATH=$devenv_tools_dir/bin:$PATH
 source $devenv_tools_dir/config/fzf-key-bindings.bash
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export GF_PREFERRED_PAGER="delta --theme=gruvbox --highlight-removed -w __WIDTH__"
