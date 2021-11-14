@@ -62,7 +62,7 @@ curl -sL https://github.com/BenjaminKern/devenv-tools/raw/main/linux/pkg/abduco-
 echo "Downloading alacritty..."
 curl -sL https://github.com/BenjaminKern/devenv-tools/raw/main/linux/pkg/alacritty-0.9.0-unknown-linux-gnu.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading zoxide..."
-curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.7.9/zoxide-v0.7.9-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.7.9/zoxide-v0.7.9-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading delta..."
 curl -sL https://github.com/dandavison/delta/releases/download/0.9.2/delta-0.9.2-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading ttyd..."
