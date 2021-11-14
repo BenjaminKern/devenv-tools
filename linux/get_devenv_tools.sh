@@ -26,7 +26,7 @@ chmod u+x $DESTDIR/bin/clangd*
 echo "Downloading ripgrep..."
 curl -sL https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading fzf..."
-curl -sL https://github.com/junegunn/fzf/releases/download/0.27.3/fzf-0.27.3-linux_amd64.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+curl -sL https://github.com/junegunn/fzf/releases/download/0.28.0/fzf-0.28.0-linux_amd64.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading hexyl..."
 curl -sL https://github.com/sharkdp/hexyl/releases/download/v0.9.0/hexyl-v0.9.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading hyperfine..."
@@ -41,7 +41,7 @@ echo "Downloading sd..."
 curl -sL https://github.com/chmln/sd/releases/download/v0.7.6/sd-v0.7.6-x86_64-unknown-linux-musl -o $DESTDIR/bin/sd
 chmod u+x $DESTDIR/bin/sd
 echo "Downloading starship..."
-curl -sL https://github.com/starship/starship/releases/download/v0.58.0/starship-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+curl -sL https://github.com/starship/starship/releases/download/v1.0.0/starship-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading lsd..."
 curl -sL https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd-0.20.1-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading dust..."
@@ -62,9 +62,9 @@ curl -sL https://github.com/BenjaminKern/devenv-tools/raw/main/linux/pkg/abduco-
 echo "Downloading alacritty..."
 curl -sL https://github.com/BenjaminKern/devenv-tools/raw/main/linux/pkg/alacritty-0.9.0-unknown-linux-gnu.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading zoxide..."
-curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.7.8/zoxide-v0.7.8-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.7.9/zoxide-v0.7.9-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading delta..."
-curl -sL https://github.com/dandavison/delta/releases/download/0.9.1/delta-0.9.1-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/dandavison/delta/releases/download/0.9.2/delta-0.9.2-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading ttyd..."
 curl -sL https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64 -o $DESTDIR/bin/ttyd
 chmod u+x $DESTDIR/bin/ttyd
