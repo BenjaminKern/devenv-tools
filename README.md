@@ -23,3 +23,4 @@
 - [Ttyd](https://github.com/tsl0922/ttyd)
 - [Watchexec](https://github.com/watchexec/watchexec)
 - [Stylua](https://github.com/JohnnyMorganz/StyLua)
+- [xh](https://github.com/ducaale/xh)
