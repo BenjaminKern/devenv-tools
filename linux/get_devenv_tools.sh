@@ -73,6 +73,8 @@ curl -sL https://github.com/watchexec/watchexec/releases/download/cli-v1.17.1/wa
 echo "Downloading stylua..."
 curl -sL https://github.com/JohnnyMorganz/StyLua/releases/download/v0.11.0/stylua-0.11.0-linux.zip | bsdtar xf - -C $DESTDIR/bin
 chmod u+x $DESTDIR/bin/stylua
+echo "Downloading xh..."
+curl -Ls https://github.com/ducaale/xh/releases/download/v0.14.1/xh-v0.14.1-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading fzf.keybindings.bash..."
 curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash -o $DESTDIR/config/fzf-key-bindings.bash
 echo "Downloading fzf.completions.bash..."
