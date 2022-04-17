@@ -19,42 +19,42 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nv
 # echo "Downloading yarn..."
 # curl -sL https://github.com/yarnpkg/yarn/releases/download/v1.22.17/yarn-v1.22.17.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
 echo "Downloading clangd..."
-curl -sL https://github.com/clangd/clangd/releases/download/13.0.0/clangd-linux-13.0.0.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
+curl -sL https://github.com/clangd/clangd/releases/download/14.0.0/clangd-linux-14.0.0.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 echo "Downloading clangd indexer..."
-curl -sL https://github.com/clangd/clangd/releases/download/13.0.0/clangd_indexing_tools-linux-13.0.0.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
+curl -sL https://github.com/clangd/clangd/releases/download/14.0.0/clangd_indexing_tools-linux-14.0.0.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 chmod u+x $DESTDIR/bin/clangd*
 echo "Downloading ripgrep..."
 curl -sL https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading fzf..."
-curl -sL https://github.com/junegunn/fzf/releases/download/0.28.0/fzf-0.28.0-linux_amd64.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+curl -sL https://github.com/junegunn/fzf/releases/download/0.30.0/fzf-0.30.0-linux_amd64.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading hexyl..."
 curl -sL https://github.com/sharkdp/hexyl/releases/download/v0.9.0/hexyl-v0.9.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading hyperfine..."
 curl -sL https://github.com/sharkdp/hyperfine/releases/download/v1.12.0/hyperfine-v1.12.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading fd..."
-curl -sL https://github.com/sharkdp/fd/releases/download/v8.2.1/fd-v8.2.1-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/sharkdp/fd/releases/download/v8.3.2/fd-v8.3.2-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading bat..."
-curl -sL https://github.com/sharkdp/bat/releases/download/v0.18.3/bat-v0.18.3-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/sharkdp/bat/releases/download/v0.20.0/bat-v0.20.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading vivid..."
-curl -sL https://github.com/sharkdp/vivid/releases/download/v0.7.0/vivid-v0.7.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/sharkdp/vivid/releases/download/v0.8.0/vivid-v0.8.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading sd..."
 curl -sL https://github.com/chmln/sd/releases/download/v0.7.6/sd-v0.7.6-x86_64-unknown-linux-musl -o $DESTDIR/bin/sd
 chmod u+x $DESTDIR/bin/sd
 echo "Downloading starship..."
-curl -sL https://github.com/starship/starship/releases/download/v1.0.0/starship-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+curl -sL https://github.com/starship/starship/releases/download/v1.6.2/starship-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading lsd..."
-curl -sL https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd-0.20.1-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/Peltoche/lsd/releases/download/0.21.0/lsd-0.21.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading dust..."
-curl -sL https://github.com/bootandy/dust/releases/download/v0.7.5/dust-v0.7.5-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/bootandy/dust/releases/download/v0.8.0/dust-v0.8.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading gojq..."
-curl -sL https://github.com/itchyny/gojq/releases/download/v0.12.5/gojq_v0.12.5_linux_amd64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/itchyny/gojq/releases/download/v0.12.7/gojq_v0.12.7_linux_amd64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading btop..."
 curl -sL https://github.com/aristocratos/btop/releases/download/v1.2.6/btop-x86_64-linux-musl.tbz | bsdtar xfj - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading age..."
 curl -sL https://github.com/FiloSottile/age/releases/download/v1.0.0/age-v1.0.0-linux-amd64.tar.gz| bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 # echo "Downloading direnv..."
 # curl -sL https://github.com/direnv/direnv/releases/download/v2.28.0/direnv.linux-amd64 -o $DESTDIR/bin/direnv
-chmod u+x $DESTDIR/bin/direnv
+# chmod u+x $DESTDIR/bin/direnv
 echo "Downloading gdbinit-gef..."
 curl -sL https://github.com/hugsy/gef/raw/master/gef.py -o $DESTDIR/config/gdbinit-gef.py
 echo "Downloading abduco..."
@@ -62,19 +62,19 @@ curl -sL https://github.com/BenjaminKern/devenv-tools/raw/main/linux/pkg/abduco-
 # echo "Downloading kitty..."
 # curl -Ls https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-x86_64.txz | bsdtar xfJ - -C $DESTDIR
 echo "Downloading zoxide..."
-curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.7.9/zoxide-v0.7.9-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.8.0/zoxide-v0.8.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading delta..."
-curl -sL https://github.com/dandavison/delta/releases/download/0.9.2/delta-0.9.2-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/dandavison/delta/releases/download/0.12.1/delta-0.12.1-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading ttyd..."
 curl -sL https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64 -o $DESTDIR/bin/ttyd
 chmod u+x $DESTDIR/bin/ttyd
 echo "Downloading watchexec..."
-curl -sL https://github.com/watchexec/watchexec/releases/download/cli-v1.17.1/watchexec-1.17.1-x86_64-unknown-linux-musl.tar.xz | bsdtar xfJ - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/watchexec/watchexec/releases/download/cli-v1.19.0/watchexec-1.19.0-x86_64-unknown-linux-musl.tar.xz | bsdtar xfJ - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading stylua..."
-curl -sL https://github.com/JohnnyMorganz/StyLua/releases/download/v0.11.0/stylua-0.11.0-linux.zip | bsdtar xf - -C $DESTDIR/bin
+curl -sL https://github.com/JohnnyMorganz/StyLua/releases/download/v0.13.1/stylua-linux.zip | bsdtar xf - -C $DESTDIR/bin
 chmod u+x $DESTDIR/bin/stylua
 echo "Downloading xh..."
-curl -Ls https://github.com/ducaale/xh/releases/download/v0.14.1/xh-v0.14.1-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -Ls https://github.com/ducaale/xh/releases/download/v0.15.0/xh-v0.15.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading fzf.keybindings.bash..."
 curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash -o $DESTDIR/config/fzf-key-bindings.bash
 echo "Downloading fzf.completions.bash..."
