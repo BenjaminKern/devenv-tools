@@ -14,7 +14,7 @@
 - [Lsd](https://github.com/Peltoche/lsd)
 - [Dust](https://github.com/bootandy/dust)
 - [Gojq](https://github.com/itchyny/gojq)
-- [Bottom](https://github.com/ClementTsang/bottom)
+- [btop](https://github.com/aristocratos/btop)
 - [Age](https://github.com/FiloSottile/age)
 - [Direnv](https://github.com/direnv/direnv)
 - [Gef](https://github.com/hugsy/gef)
