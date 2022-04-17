@@ -48,8 +48,8 @@ echo "Downloading dust..."
 curl -sL https://github.com/bootandy/dust/releases/download/v0.7.5/dust-v0.7.5-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading gojq..."
 curl -sL https://github.com/itchyny/gojq/releases/download/v0.12.5/gojq_v0.12.5_linux_amd64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
-echo "Downloading bottom..."
-curl -sL https://github.com/ClementTsang/bottom/releases/download/0.6.4/bottom_x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+echo "Downloading btop..."
+curl -sL https://github.com/aristocratos/btop/releases/download/v1.2.6/btop-x86_64-linux-musl.tbz | bsdtar xfj - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading age..."
 curl -sL https://github.com/FiloSottile/age/releases/download/v1.0.0/age-v1.0.0-linux-amd64.tar.gz| bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 # echo "Downloading direnv..."
