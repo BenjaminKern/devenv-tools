@@ -85,7 +85,10 @@ echo "Downloading devenv_tools.bash..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
 echo "Downloading starship.toml..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
-yarn config set global-folder $DESTDIR/config/yarn/global
+echo "Downloading helix editor..."
+curl -sL https://github.com/helix-editor/helix/releases/download/22.03/helix-22.03-x86_64-linux.tar.xz | bsdtar xfJ - --strip-components=1 -C $DESTDIR/bin
+
+# yarn config set global-folder $DESTDIR/config/yarn/global
 # echo "Installing pyright"
 # yarn global add pyright --prefix $DESTDIR
 # echo "Installing prettier"
