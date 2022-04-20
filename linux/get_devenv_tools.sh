@@ -9,15 +9,10 @@ mkdir -p $DESTDIR/config
 
 echo "Downloading nvim..."
 curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
-# curl -sL https://github.com/neovim/neovim/releases/download/v0.5.1/nvim-linux64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
 echo "Downloading vim plugged..."
 curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o $DESTDIR/share/nvim/runtime/pack/dist/opt/plug/plugin/plug.vim --create-dirs
 echo "Downloading neovim config..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/init.lua -o $DESTDIR/share/nvim/runtime/lua/devenv_config.lua
-# echo "Downloading node..."
-# curl -sL install-node.now.sh | bash -s -- --prefix=$DESTDIR --yes
-# echo "Downloading yarn..."
-# curl -sL https://github.com/yarnpkg/yarn/releases/download/v1.22.17/yarn-v1.22.17.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o $DESTDIR/share/nvim/runtime/lua/devenv_config.lua
 echo "Downloading clangd..."
 curl -sL https://github.com/clangd/clangd/releases/download/14.0.0/clangd-linux-14.0.0.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 echo "Downloading clangd indexer..."
@@ -52,15 +47,10 @@ echo "Downloading btop..."
 curl -sL https://github.com/aristocratos/btop/releases/download/v1.2.6/btop-x86_64-linux-musl.tbz | bsdtar xfj - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading age..."
 curl -sL https://github.com/FiloSottile/age/releases/download/v1.0.0/age-v1.0.0-linux-amd64.tar.gz| bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
-# echo "Downloading direnv..."
-# curl -sL https://github.com/direnv/direnv/releases/download/v2.28.0/direnv.linux-amd64 -o $DESTDIR/bin/direnv
-# chmod u+x $DESTDIR/bin/direnv
 echo "Downloading gdbinit-gef..."
 curl -sL https://github.com/hugsy/gef/raw/master/gef.py -o $DESTDIR/config/gdbinit-gef.py
 echo "Downloading abduco..."
 curl -sL https://github.com/BenjaminKern/devenv-tools/raw/main/linux/pkg/abduco-0.6-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
-# echo "Downloading kitty..."
-# curl -Ls https://github.com/kovidgoyal/kitty/releases/download/nightly/kitty-nightly-x86_64.txz | bsdtar xfJ - -C $DESTDIR
 echo "Downloading zoxide..."
 curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.8.0/zoxide-v0.8.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading delta..."
@@ -88,16 +78,9 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/st
 echo "Downloading helix editor..."
 curl -sL https://github.com/helix-editor/helix/releases/download/22.03/helix-22.03-x86_64-linux.tar.xz | bsdtar xfJ - --strip-components=1 -C $DESTDIR/bin
 
-# yarn config set global-folder $DESTDIR/config/yarn/global
-# echo "Installing pyright"
-# yarn global add pyright --prefix $DESTDIR
-# echo "Installing prettier"
-# yarn global add prettier --prefix $DESTDIR
 echo "Add the following line to ~/.bashrc"
 echo "source $DESTDIR/devenv_tools.bash"
 echo "Add the following line to ~/.gdbinit"
 echo "source $DESTDIR/config/gdbinit-gef.py"
 echo "Add the following line to ~/.config/nvim/init.lua"
 echo "require('devenv_config')"
-# echo "Downloading broot..."
-# curl -sL https://github.com/Canop/broot/releases/download/v1.6.3/broot_1.6.3.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
