@@ -37,9 +37,6 @@ tar xf fd.zip -C %DESTDIR%\bin
 echo "Downloading bat..."
 curl -sL https://github.com/sharkdp/bat/releases/download/v0.20.0/bat-v0.20.0-x86_64-pc-windows-msvc.zip -o bat.zip
 tar xf bat.zip --strip-components=1 -C %DESTDIR%\bin
-echo "Downloading lsd..."
-curl -sL https://github.com/Peltoche/lsd/releases/download/0.21.0/lsd-0.21.0-x86_64-pc-windows-msvc.zip -o lsd.zip
-tar xf lsd.zip --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading dust..."
 curl -sL https://github.com/bootandy/dust/releases/download/v0.8.0/dust-v0.8.0-x86_64-pc-windows-msvc.zip -o dust.zip
 tar xf dust.zip --strip-components=1 -C %DESTDIR%\bin
