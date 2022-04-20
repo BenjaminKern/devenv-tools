@@ -33,7 +33,7 @@ curl -sL https://github.com/sharkdp/hyperfine/releases/download/v1.12.0/hyperfin
 tar xf hyperfine.zip --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading fd..."
 curl -sL https://github.com/sharkdp/fd/releases/download/v8.3.2/fd-v8.3.2-x86_64-pc-windows-msvc.zip -o fd.zip
-tar xf fd.zip -C %DESTDIR%\bin
+tar xf fd.zip --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading bat..."
 curl -sL https://github.com/sharkdp/bat/releases/download/v0.20.0/bat-v0.20.0-x86_64-pc-windows-msvc.zip -o bat.zip
 tar xf bat.zip --strip-components=1 -C %DESTDIR%\bin
