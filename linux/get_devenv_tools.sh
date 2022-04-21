@@ -6,6 +6,8 @@ DESTDIR="$(readlink -e $1)"
 mkdir -p $DESTDIR/bin
 PATH=$DESTDIR/bin:$PATH
 mkdir -p $DESTDIR/config
+mkdir -p $DESTDIR/share/nvim/sessions
+mkdir -p $DESTDIR/share/nvim/runtime/snippets
 
 echo "Downloading nvim..."
 curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR

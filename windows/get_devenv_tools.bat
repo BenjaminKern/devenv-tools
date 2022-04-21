@@ -8,6 +8,8 @@ mkdir %DESTDIR%\neovim
 echo "Downloading nvim..."
 curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip -o nvim.zip
 tar xf nvim.zip --strip-components=1 -C %DESTDIR%\neovim
+mkdir %DESTDIR%\neovim\share\nvim\sessions
+mkdir %DESTDIR%\neovim\share\nvim\runtime\snippets
 echo "Downloading vim plugged..."
 curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o %DESTDIR%\neovim\share\nvim\runtime\pack\dist\opt\plug\plugin\plug.vim --create-dirs
 echo "Downloading neovim config..."
