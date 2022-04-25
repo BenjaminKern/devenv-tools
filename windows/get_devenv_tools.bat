@@ -4,6 +4,8 @@ setlocal enableextensions
 set DESTDIR=%1
 mkdir %DESTDIR%\mingit
 mkdir %DESTDIR%\neovim
+mkdir %DESTDIR%\busybox
+mkdir %DESTDIR%\clink
 
 echo "Downloading nvim..."
 curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip -o nvim.zip
@@ -63,7 +65,7 @@ curl -sL https://github.com/git-for-windows/git/releases/download/v2.36.0.window
 tar xf mingit.zip -C %DESTDIR%\mingit
 echo "Downloading clink..."
 curl -sL https://github.com/chrisant996/clink/releases/download/v1.3.15/clink.1.3.15.6e6e45.zip -o clink.zip
-tar xf clink.zip -C %DESTDIR%\bin
+tar xf clink.zip -C %DESTDIR%\clink
 echo "Download cmake..."
 curl -sL https://github.com/Kitware/CMake/releases/download/v3.23.1/cmake-3.23.1-windows-x86_64.zip -o cmake.zip
 tar xf cmake.zip --strip-components=1 -C %DESTDIR%
