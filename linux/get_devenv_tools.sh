@@ -15,6 +15,10 @@ echo "Downloading vim plugged..."
 curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o $DESTDIR/share/nvim/runtime/pack/dist/opt/plug/plugin/plug.vim --create-dirs
 echo "Downloading neovim config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o $DESTDIR/share/nvim/runtime/lua/devenv_config.lua
+echo "Downloading neovim snippets..."
+curl -sLO https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/_.snippets -o $DESTDIR/share/nvim/runtime/snippets/
+curl -sLO https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/c.snippets -o $DESTDIR/share/nvim/runtime/snippets/
+curl -sLO https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/cpp.snippets -o $DESTDIR/share/nvim/runtime/snippets/
 echo "Downloading clangd..."
 curl -sL https://github.com/clangd/clangd/releases/download/14.0.0/clangd-linux-14.0.0.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 echo "Downloading clangd indexer..."
