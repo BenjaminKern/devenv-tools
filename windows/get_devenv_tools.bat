@@ -7,6 +7,8 @@ mkdir %DESTDIR%\neovim
 mkdir %DESTDIR%\busybox
 mkdir %DESTDIR%\clink
 
+echo "Downloading devenv_tools config..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/devenv_tools.bat -o %DESTDIR%\devenv_tools.bat
 echo "Downloading nvim..."
 curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip -o nvim.zip
 tar xf nvim.zip --strip-components=1 -C %DESTDIR%\neovim
@@ -17,9 +19,9 @@ curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o 
 echo "Downloading neovim config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o %DESTDIR%\neovim\share\nvim\runtime\lua\devenv_config.lua
 echo "Downloading neovim snippets..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/_.snippets -o $DESTDIR\share\nvim\runtime\snippets\
-curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/c.snippets -o $DESTDIR\share\nvim\runtime\snippets\
-curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/cpp.snippets -o $DESTDIR\share\nvim\runtime\snippets\
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/_.snippets -o %DESTDIR%\neovim\share\nvim\runtime\snippets\_.snippets
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/c.snippets -o %DESTDIR%\neovim\share\nvim\runtime\snippets\c.snippets
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/cpp.snippets -o %DESTDIR%\neovim\share\nvim\runtime\snippets\cpp.snippets
 echo "Downloading fd ignore file..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o %DESTDIR%\neovim\share\nvim\.fd-ignore
 echo "Downloading clangd..."
