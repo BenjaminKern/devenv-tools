@@ -38,6 +38,9 @@ HISTFILESIZE=100000
 HISTCONTROL="erasedups:ignoreboth"
 export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
 HISTTIMEFORMAT='%F %T '
+alias for_all_files='fd --type f -x'
+alias find_and_replace='fd --type f -x sd'
+alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
 
 eval "$(zoxide init --cmd j bash)"
 eval "$(starship init bash)"
