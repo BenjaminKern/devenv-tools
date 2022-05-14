@@ -81,7 +81,10 @@ curl -sL https://github.com/starship/starship/releases/download/v1.6.3/starship-
 tar xf starship.zip -C %DESTDIR%\bin
 echo "Download python..."
 curl -sL https://www.python.org/ftp/python/3.10.4/python-3.10.4-embed-amd64.zip -o python.zip
-tar xf python.zip --strip-components=1 -C %DESTDIR%\python
+tar xf python.zip -C %DESTDIR%\python
+echo "Download ninja..."
+curl -sL https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip -o ninja.zip
+tar xf ninja.zip -C %DESTDIR%\bin
 echo "Setup busybox..."
 copy /y %DESTDIR%\mingit\mingw64\bin\busybox.exe %DESTDIR%\busybox\
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/busybox_template.bat -o %DESTDIR%\busybox_template.bat
