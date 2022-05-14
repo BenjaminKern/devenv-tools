@@ -11,6 +11,7 @@ mkdir %DESTDIR%\clink\scripts
 mkdir %DESTDIR%\cmake
 mkdir %DESTDIR%\clangd
 mkdir %DESTDIR%\python
+mkdir %DESTDIR%\cpptools
 
 echo "Downloading devenv_tools config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/devenv_tools.bat -o %DESTDIR%\devenv_tools.bat
@@ -85,6 +86,9 @@ tar xf python.zip -C %DESTDIR%\python
 echo "Download ninja..."
 curl -sL https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip -o ninja.zip
 tar xf ninja.zip -C %DESTDIR%\bin
+echo "Download vscode cpptools..."
+curl -LsO https://github.com/microsoft/vscode-cpptools/releases/download/v1.9.8/cpptools-win64.vsix
+tar xf cpptools-win64.vsix --strip-components=1 -C %DESTDIR%\cpptools
 echo "Setup busybox..."
 copy /y %DESTDIR%\mingit\mingw64\bin\busybox.exe %DESTDIR%\busybox\
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/busybox_template.bat -o %DESTDIR%\busybox_template.bat
