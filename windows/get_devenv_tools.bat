@@ -80,10 +80,13 @@ echo "Download starship..."
 curl -sL https://github.com/starship/starship/releases/download/v1.6.3/starship-x86_64-pc-windows-msvc.zip -o starship.zip
 tar xf starship.zip -C %DESTDIR%\bin
 echo "Download lldb..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/bin/lldb-bin.tar.xz | bsdtar xfJ - --strip-components=1 -C $DESTDIR/bin
+curl -sLO https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/bin/lldb-bin.tar.xz
 echo "Download python..."
 curl -sL https://www.python.org/ftp/python/3.10.4/python-3.10.4-embed-amd64.zip -o python.zip
-tar xf python.zip --strip-components=1 -C %DESTDIR%\python
+tar xf python.zip -C %DESTDIR%\python
+echo "Download ninja..."
+curl -sL https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip -o ninja.zip
+tar xf ninja.zip -C %DESTDIR%\bin
 echo "Setup busybox..."
 copy /y %DESTDIR%\mingit\mingw64\bin\busybox.exe %DESTDIR%\busybox\
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/busybox_template.bat -o %DESTDIR%\busybox_template.bat
