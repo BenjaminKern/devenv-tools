@@ -1,6 +1,6 @@
 @echo off
 if not exist "%~dp0busybox\busybox.exe" goto fail
-set PATH=%~dp0bin;%~dp0neovim\bin;%~dp0mingit\cmd;%~dp0busybox;%~dp0clink;%~dp0cmake\bin;%~dp0clangd\bin;%PATH%
+set PATH=%~dp0bin;%~dp0neovim\bin;%~dp0mingit\cmd;%~dp0busybox;%~dp0clink;%~dp0cmake\bin;%~dp0clangd\bin;%~dp0python;%PATH%
 set CLINK_PATH=%~dp0clink\scripts
 doskey j=zoxide query $*
 doskey ff=fzf $*
