@@ -7,9 +7,33 @@ export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $de
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
 export LS_COLORS="$(vivid generate gruvbox-dark)"
 alias ls='lsd'
-alias ff="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}' --bind ctrl-alt-k:preview-page-up,ctrl-alt-j:preview-page-down"
 export EDITOR=nvim
 alias cat='bat --paging=never'
+is_in_git_repo() {
+  git rev-parse HEAD > /dev/null 2>&1
+}
+ff() {
+    fzf \
+      --ansi --no-sort --reverse --tiebreak=index \
+      --preview "bat --theme gruvbox-dark --style=numbers --color=always --line-range :500 {}" \
+      --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
+      --preview-window=right:60%
+}
+gv() {
+  is_in_git_repo || return
+
+  local filter
+  if [ -n $@ ] && [ -f $@ ]; then
+    filter="-- $@"
+  fi
+
+  git lg $@ | \
+    fzf \
+      --ansi --no-sort --reverse --tiebreak=index \
+      --preview "f() { set -- \$(echo -- \$@ | grep -o '[a-f0-9]\{7\}'); [ \$# -eq 0 ] || git show --color=always --format=fuller \$1 $filter | delta --line-numbers --syntax-theme=gruvbox-dark; }; f {}" \
+      --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
+      --preview-window=right:60%
+}
 
 [[ -v devenv_tools_proxy ]] && \
   export HTTP_PROXY=$devenv_tools_proxy && \
