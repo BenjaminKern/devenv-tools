@@ -34,6 +34,22 @@ gv() {
       --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
       --preview-window=right:60%
 }
+gco() {
+  is_in_git_repo || return
+
+  local branches target
+  branches=$(
+    git --no-pager branch --all \
+      --format="%(if)%(HEAD)%(then)%(else)%(if:equals=HEAD)%(refname:strip=3)%(then)%(else)%1B[0;34;1mbranch%09%1B[m%(refname:short)%(end)%(end)" \
+    | sed '/^$/d') || return
+  target=$(
+    echo "$branches" |
+    fzf --reverse --no-multi -n 2 \
+        --ansi --preview="git diff HEAD..{2} | delta --line-numbers --syntax-theme=gruvbox-dark; " \
+        --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
+        --preview-window=right:60%) || return
+  git checkout $(echo "$target" | cut -f 2)
+}
 
 [[ -v devenv_tools_proxy ]] && \
   export HTTP_PROXY=$devenv_tools_proxy && \
