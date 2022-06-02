@@ -81,8 +81,8 @@ echo "Downloading devenv_tools.bash..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
 echo "Downloading starship.toml..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
-echo "Downloading helix editor..."
-curl -sL https://github.com/helix-editor/helix/releases/download/22.03/helix-22.03-x86_64-linux.tar.xz | bsdtar xfJ - --strip-components=1 -C $DESTDIR/bin
+echo "Downloading tmux.conf.common..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/tmux.conf.common -o $DESTDIR/tmux.conf.common
 
 echo "Add the following line to ~/.bashrc"
 echo "source $DESTDIR/devenv_tools.bash"
