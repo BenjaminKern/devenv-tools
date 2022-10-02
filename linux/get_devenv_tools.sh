@@ -54,7 +54,7 @@ curl -sL https://github.com/aristocratos/btop/releases/download/v1.2.9/btop-x86_
 echo "Downloading age..."
 curl -sL https://github.com/FiloSottile/age/releases/download/v1.0.0/age-v1.0.0-linux-amd64.tar.gz| bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading gdbinit-gef..."
-curl -sL https://github.com/hugsy/gef/raw/master/gef.py -o $DESTDIR/config/gdbinit-gef.py
+curl -sL https://raw.githubusercontent.com/hugsy/gef/dev/gef.py -o $DESTDIR/config/gdbinit-gef.py
 echo "Downloading zoxide..."
 curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.8.3/zoxide-0.8.3-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading delta..."
