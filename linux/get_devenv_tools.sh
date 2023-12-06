@@ -66,6 +66,9 @@ curl -sL https://github.com/JohnnyMorganz/StyLua/releases/download/v0.19.1/stylu
 chmod u+x $DESTDIR/bin/stylua
 echo "Downloading xh..."
 curl -Ls https://github.com/ducaale/xh/releases/download/v0.20.1/xh-v0.20.1-x86_64-unknown-linux-musl.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR/bin
+echo "Downloading deno..."
+curl -Ls https://github.com/denoland/deno/releases/download/v1.38.5/deno-x86_64-unknown-linux-gnu.zip | bsdtar xf - -C $DESTDIR/bin
+chmod u+x $DESTDIR/bin/deno
 echo "Downloading lldb..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/bin/lldb-bin.tar.xz | tar xfJ - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading fzf.keybindings.bash..."
