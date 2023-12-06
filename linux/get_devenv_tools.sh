@@ -68,6 +68,8 @@ echo "Downloading xh..."
 curl -Ls https://github.com/ducaale/xh/releases/download/v0.17.0/xh-v0.17.0-x86_64-unknown-linux-musl.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading lldb..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/bin/lldb-bin.tar.xz | tar xfJ - --strip-components=1 -C $DESTDIR/bin
+echo "Downloading buildifier..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/bin/buildifier.tar.xz | tar xfJ - -C $DESTDIR/bin
 echo "Downloading fzf.keybindings.bash..."
 curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash -o $DESTDIR/config/fzf-key-bindings.bash
 echo "Downloading fzf.completions.bash..."
