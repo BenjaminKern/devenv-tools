@@ -11,8 +11,6 @@ mkdir -p $DESTDIR/share/nvim/runtime/snippets
 
 echo "Downloading nvim..."
 curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR
-echo "Downloading vim plugged..."
-curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o $DESTDIR/share/nvim/runtime/pack/dist/opt/plug/plugin/plug.vim --create-dirs
 echo "Downloading neovim config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o $DESTDIR/share/nvim/runtime/lua/devenv_config.lua
 echo "Downloading neovim snippets..."
