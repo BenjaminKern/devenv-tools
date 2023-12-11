@@ -13,6 +13,8 @@ echo "Downloading nvim..."
 curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR
 echo "Downloading neovim config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o $DESTDIR/share/nvim/runtime/lua/devenv_config.lua
+echo "Downloading colorscheme..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/colors/xyztokyo.lua -o $DESTDIR/share/nvim/runtime/colors/xyztokyo.lua
 echo "Downloading neovim snippets..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/_.snippets -o $DESTDIR/share/nvim/runtime/snippets/_.snippets
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/c.snippets -o $DESTDIR/share/nvim/runtime/snippets/c.snippets
