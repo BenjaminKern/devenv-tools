@@ -81,8 +81,6 @@ echo "Downloading devenv_tools.bash..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
 echo "Downloading starship.toml..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
-echo "Downloading tmux.conf.common..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/tmux.conf.common -o $DESTDIR/tmux.conf.common
 
 echo "Add the following line to ~/.bashrc"
 echo "source $DESTDIR/devenv_tools.bash"
@@ -90,5 +88,3 @@ echo "Add the following line to ~/.gdbinit"
 echo "source $DESTDIR/config/gdbinit-gef.py"
 echo "Add the following line to ~/.config/nvim/init.lua"
 echo "require('devenv_config')"
-echo "Add the following line to ~/.tmux.conf"
-echo "source-file $DESTDIR/tmux.conf.common"
