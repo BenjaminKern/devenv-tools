@@ -5,7 +5,7 @@ PATH=$devenv_tools_dir/bin:$PATH
 source $devenv_tools_dir/config/fzf-key-bindings.bash
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
-export LS_COLORS="$(vivid generate gruvbox-dark)"
+export LS_COLORS="$(vivid generate nord)"
 alias ls='lsd'
 export EDITOR=nvim
 alias cat='bat --paging=never'
