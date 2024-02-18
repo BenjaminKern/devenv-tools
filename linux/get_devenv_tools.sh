@@ -39,7 +39,7 @@ curl -sL https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x8
 echo "Downloading vivid..."
 curl -sL https://github.com/sharkdp/vivid/releases/download/v0.9.0/vivid-v0.9.0-x86_64-unknown-linux-musl.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading sd..."
-curl -sL https://github.com/chmln/sd/releases/download/v1.0.0/sd-v1.0.0-x86_64-unknown-linux-musl -o $DESTDIR/bin/sd
+curl -sL https://github.com/chmln/sd/releases/download/v1.0.0/sd-v1.0.0-x86_64-unknown-linux-musl.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR/bin
 chmod u+x $DESTDIR/bin/sd
 echo "Downloading starship..."
 curl -sL https://github.com/starship/starship/releases/download/v1.16.0/starship-x86_64-unknown-linux-musl.tar.gz | tar xfz - -C $DESTDIR/bin
