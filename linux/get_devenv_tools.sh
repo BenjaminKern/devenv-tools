@@ -69,6 +69,8 @@ curl -Ls https://github.com/ducaale/xh/releases/download/v0.20.1/xh-v0.20.1-x86_
 echo "Downloading deno..."
 curl -Ls https://github.com/denoland/deno/releases/download/v1.38.5/deno-x86_64-unknown-linux-gnu.zip | bsdtar xf - -C $DESTDIR/bin
 chmod u+x $DESTDIR/bin/deno
+curl -Ls https://github.com/bazelbuild/buildtools/releases/download/v7.3.1/buildifier-linux-amd64 -o $DESTDIR/bin/buildifier
+chmod u+x $DESTDIR/bin/buildifier
 echo "Downloading lldb..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/bin/lldb-bin.tar.xz | tar xfJ - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading fzf.keybindings.bash..."
