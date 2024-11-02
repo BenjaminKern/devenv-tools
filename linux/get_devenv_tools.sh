@@ -76,10 +76,6 @@ curl -Ls https://github.com/bazelbuild/buildtools/releases/download/v7.3.1/build
 chmod u+x $DESTDIR/bin/buildifier
 echo "Downloading lldb..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/bin/lldb-bin.tar.xz | tar xfJ - --strip-components=1 -C $DESTDIR/bin
-echo "Downloading fzf.keybindings.bash..."
-curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash -o $DESTDIR/config/fzf-key-bindings.bash
-echo "Downloading fzf.completions.bash..."
-curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/completion.bash -o $DESTDIR/bin/autocomplete/fzf.bash-completion
 echo "Downloading fd ignore file..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o $DESTDIR/share/nvim/.fd-ignore
 echo "Downloading devenv_tools.bash..."
