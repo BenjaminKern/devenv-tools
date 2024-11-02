@@ -2,20 +2,20 @@ devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ! [[ -f $devenv_tools_dir/devenv_tools.bash ]] && return
 
 PATH=$devenv_tools_dir/bin:$PATH
-source $devenv_tools_dir/config/fzf-key-bindings.bash
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
-export LS_COLORS="$(vivid generate nord)"
+export LS_COLORS="$(vivid generate one-dark)"
 alias ls='lsd'
 export EDITOR=nvim
 alias cat='bat --paging=never'
+eval "$(fzf --bash)"
 is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
 }
 ff() {
     fzf \
       --ansi --no-sort --reverse --tiebreak=index \
-      --preview "bat --theme gruvbox-dark --style=numbers --color=always --line-range :500 {}" \
+      --preview "bat --theme OneHalfDark --style=numbers --color=always --line-range :500 {}" \
       --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
       --preview-window=right:60%
 }
@@ -30,7 +30,7 @@ gv() {
   git lg $@ | \
     fzf \
       --ansi --no-sort --reverse --tiebreak=index \
-      --preview "f() { set -- \$(echo -- \$@ | grep -o '[a-f0-9]\{7\}'); [ \$# -eq 0 ] || git show --color=always --format=fuller \$1 $filter | delta --line-numbers --syntax-theme=gruvbox-dark; }; f {}" \
+      --preview "f() { set -- \$(echo -- \$@ | grep -o '[a-f0-9]\{7\}'); [ \$# -eq 0 ] || git show --color=always --format=fuller \$1 $filter | delta --line-numbers --syntax-theme=OneHalfDark; }; f {}" \
       --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
       --preview-window=right:60%
 }
@@ -45,11 +45,29 @@ gco() {
   target=$(
     echo "$branches" |
     fzf --reverse --no-multi -n 2 \
-        --ansi --preview="git diff HEAD..{2} | delta --line-numbers --syntax-theme=gruvbox-dark; " \
+        --ansi --preview="git diff HEAD..{2} | delta --line-numbers --syntax-theme=OneHalfDark; " \
         --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
         --preview-window=right:60%) || return
   git checkout $(echo "$target" | cut -f 2)
 }
+
+rfv() (
+  RELOAD='reload:rg --column --color=always --smart-case {q} || :'
+  OPENER='if [[ $FZF_SELECT_COUNT -eq 0 ]]; then
+            nvim {1} +{2}     # No selection. Open the current line in Vim.
+          else
+            nvim +cw -q {+f}  # Build quickfix list for the selected items.
+          fi'
+  fzf --disabled --ansi --multi \
+      --bind "start:$RELOAD" --bind "change:$RELOAD" \
+      --bind "enter:become:$OPENER" \
+      --bind "ctrl-o:execute:$OPENER" \
+      --bind 'alt-a:select-all,alt-d:deselect-all,ctrl-/:toggle-preview' \
+      --delimiter : \
+      --preview 'bat --theme OneHalfDark --style=full --color=always --highlight-line {2} {1}' \
+      --preview-window '~4,+{2}+4/3,<80(up)' \
+      --query "$*"
+)
 
 [[ -v devenv_tools_proxy ]] && \
   export HTTP_PROXY=$devenv_tools_proxy && \
@@ -61,7 +79,6 @@ source $devenv_tools_dir/bin/autocomplete/bat.bash
 source $devenv_tools_dir/bin/autocomplete/fd.bash
 source $devenv_tools_dir/bin/autocomplete/hyperfine.bash
 source $devenv_tools_dir/bin/autocomplete/lsd.bash-completion
-source $devenv_tools_dir/bin/autocomplete/fzf.bash-completion
 source $devenv_tools_dir/bin/complete/rg.bash
 
 # tab completion
