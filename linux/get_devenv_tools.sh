@@ -5,6 +5,7 @@ DESTDIR="$(readlink -e $1)"
 
 mkdir -p $DESTDIR/bin
 PATH=$DESTDIR/bin:$PATH
+mkdir -p $DESTDIR/cpptools
 mkdir -p $DESTDIR/config
 mkdir -p $DESTDIR/share/nvim/sessions
 mkdir -p $DESTDIR/share/nvim/runtime/snippets
@@ -76,6 +77,9 @@ curl -Ls https://github.com/bazelbuild/buildtools/releases/download/v7.3.1/build
 chmod u+x $DESTDIR/bin/buildifier
 echo "Downloading lldb..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/bin/lldb-bin.tar.xz | tar xfJ - --strip-components=1 -C $DESTDIR/bin
+echo "Downloading vscode cpptools..."
+curl -Ls https://github.com/microsoft/vscode-cpptools/releases/download/v1.22.11/cpptools-linux-x64.vsix | bsdtar xf - --strip-components=1 -C $DESTDIR/cpptools
+chmod u+x $DESTDIR/cpptools/debugAdapters/bin/OpenDebugAD7
 echo "Downloading fd ignore file..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o $DESTDIR/share/nvim/.fd-ignore
 echo "Downloading devenv_tools.bash..."

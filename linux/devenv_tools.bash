@@ -1,7 +1,7 @@
 devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 ! [[ -f $devenv_tools_dir/devenv_tools.bash ]] && return
 
-PATH=$devenv_tools_dir/bin:$PATH
+PATH=$devenv_tools_dir/bin:$devenv_tools_dir/cpptools/debugAdapters/bin:$PATH
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
 export LS_COLORS="$(vivid generate one-dark)"
