@@ -21,6 +21,8 @@ curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.z
 tar xf nvim.zip --strip-components=1 -C %DESTDIR%\neovim
 mkdir %DESTDIR%\neovim\share\nvim\sessions
 mkdir %DESTDIR%\neovim\share\nvim\runtime\snippets
+echo "Downloading colorscheme..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/colors/xyztokyo.lua -o %DESTDIR%\neovim\share\nvim\runtime\colors\xyztokyo.lua
 echo "Downloading neovim config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o %DESTDIR%\neovim\share\nvim\runtime\lua\devenv_config.lua
 echo "Downloading neovim snippets..."
@@ -84,12 +86,12 @@ curl -sL https://github.com/ninja-build/ninja/releases/download/v1.12.1/ninja-wi
 tar xf ninja.zip -C %DESTDIR%\bin
 echo "Download vscode cpptools..."
 curl -LsO https://github.com/microsoft/vscode-cpptools/releases/download/v1.22.11/cpptools-windows-x64.vsix
-tar xf cpptools-win64.vsix --strip-components=1 -C %DESTDIR%\cpptools
+tar xf cpptools-windows-x64.vsix --strip-components=1 -C %DESTDIR%\cpptools
 echo "Download oh my posh"
 curl -sL https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/v24.2.2/posh-windows-amd64.exe -o oh-my-posh.exe
 copy /y oh-my-posh.exe %DESTDIR%\bin
 curl -sL https://github.com/bazelbuild/bazel/releases/download/7.4.0/bazel-7.4.0-windows-x86_64.zip -o bazel.zip
-tar xf bazel.zip --strip-components=1 -C %DESTDIR%\bazel
+tar xf bazel.zip -C %DESTDIR%\bazel
 echo "Add oh my posh to clink"
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/oh-my-posh.lua -o %DESTDIR%\clink\scripts\oh-my-posh.lua
 echo "Setup busybox..."
@@ -231,3 +233,7 @@ copy /y %DESTDIR%\busybox_template.bat %DESTDIR%\busybox\xz.bat
 copy /y %DESTDIR%\busybox_template.bat %DESTDIR%\busybox\xzcat.bat
 copy /y %DESTDIR%\busybox_template.bat %DESTDIR%\busybox\yes.bat
 copy /y %DESTDIR%\busybox_template.bat %DESTDIR%\busybox\zcat.bat
+
+echo "Add 'cmd.exe /k %DESTDIR%\devenv_tools.bat' to Command Line command"
+echo "Add the following line to ~/AppData/Local/nvim/init.lua"
+echo "require('devenv_config'^)"
