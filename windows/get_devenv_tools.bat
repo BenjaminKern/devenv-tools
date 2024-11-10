@@ -12,6 +12,7 @@ mkdir %DESTDIR%\cmake
 mkdir %DESTDIR%\clangd
 mkdir %DESTDIR%\python
 mkdir %DESTDIR%\cpptools
+mkdir %DESTDIR%\bazel
 
 echo "Downloading devenv_tools config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/devenv_tools.bat -o %DESTDIR%\devenv_tools.bat
@@ -20,8 +21,6 @@ curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.z
 tar xf nvim.zip --strip-components=1 -C %DESTDIR%\neovim
 mkdir %DESTDIR%\neovim\share\nvim\sessions
 mkdir %DESTDIR%\neovim\share\nvim\runtime\snippets
-echo "Downloading vim plugged..."
-curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o %DESTDIR%\neovim\share\nvim\runtime\pack\dist\opt\plug\plugin\plug.vim --create-dirs
 echo "Downloading neovim config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o %DESTDIR%\neovim\share\nvim\runtime\lua\devenv_config.lua
 echo "Downloading neovim snippets..."
@@ -31,64 +30,68 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nv
 echo "Downloading fd ignore file..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o %DESTDIR%\neovim\share\nvim\.fd-ignore
 echo "Downloading clangd..."
-curl -sL https://github.com/clangd/clangd/releases/download/14.0.0/clangd-windows-14.0.0.zip -o clangd.zip
+curl -sL https://github.com/clangd/clangd/releases/download/19.1.0/clangd-windows-19.1.0.zip -o clangd.zip
 tar xf clangd.zip --strip-components=1 -C %DESTDIR%\clangd
 echo "Downloading clangd indexer..."
-curl -sL https://github.com/clangd/clangd/releases/download/14.0.0/clangd_indexing_tools-windows-14.0.0.zip -o clangd_indexing_tools.zip
+curl -sL https://github.com/clangd/clangd/releases/download/19.1.0/clangd_indexing_tools-windows-19.1.0.zip -o clangd_indexing_tools.zip
 tar xf clangd_indexing_tools.zip --strip-components=1 -C %DESTDIR%\clangd
 echo "Downloading ripgrep..."
-curl -sL https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-pc-windows-msvc.zip | tar xf - --strip-components=1 -C %DESTDIR%\bin
+curl -sL https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-x86_64-pc-windows-msvc.zip | tar xf - --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading fzf..."
-curl -sL https://github.com/junegunn/fzf/releases/download/0.30.0/fzf-0.30.0-windows_amd64.zip -o fzf.zip
+curl -sL https://github.com/junegunn/fzf/releases/download/v0.56.0/fzf-0.56.0-windows_amd64.zip -o fzf.zip
 tar xf fzf.zip -C %DESTDIR%\bin
 echo "Downloading hexyl..."
-curl -sL https://github.com/sharkdp/hexyl/releases/download/v0.9.0/hexyl-v0.9.0-x86_64-pc-windows-msvc.zip -o hexyl.zip
+curl -sL https://github.com/sharkdp/hexyl/releases/download/v0.15.0/hexyl-v0.15.0-x86_64-pc-windows-msvc.zip -o hexyl.zip
 tar xf hexyl.zip --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading hyperfine..."
-curl -sL https://github.com/sharkdp/hyperfine/releases/download/v1.12.0/hyperfine-v1.12.0-x86_64-pc-windows-msvc.zip -o hyperfine.zip
+curl -sL https://github.com/sharkdp/hyperfine/releases/download/v1.18.0/hyperfine-v1.18.0-x86_64-pc-windows-msvc.zip -o hyperfine.zip
 tar xf hyperfine.zip --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading fd..."
-curl -sL https://github.com/sharkdp/fd/releases/download/v8.3.2/fd-v8.3.2-x86_64-pc-windows-msvc.zip -o fd.zip
+curl -sL https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-pc-windows-msvc.zip -o fd.zip
 tar xf fd.zip --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading bat..."
-curl -sL https://github.com/sharkdp/bat/releases/download/v0.20.0/bat-v0.20.0-x86_64-pc-windows-msvc.zip -o bat.zip
+curl -sL https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-pc-windows-msvc.zip -o bat.zip
 tar xf bat.zip --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading dust..."
-curl -sL https://github.com/bootandy/dust/releases/download/v0.8.0/dust-v0.8.0-x86_64-pc-windows-msvc.zip -o dust.zip
+curl -sL https://github.com/bootandy/dust/releases/download/v1.1.1/dust-v1.1.1-x86_64-pc-windows-msvc.zip -o dust.zip
 tar xf dust.zip --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading bottom..."
-curl -sL https://github.com/ClementTsang/bottom/releases/download/0.6.8/bottom_x86_64-pc-windows-msvc.zip -o bottom.zip
+curl -sL https://github.com/ClementTsang/bottom/releases/download/0.10.2/bottom_x86_64-pc-windows-msvc.zip -o bottom.zip
 tar xf bottom.zip -C %DESTDIR%\bin
 echo "Downloading zoxide..."
-curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.8.0/zoxide-v0.8.0-x86_64-pc-windows-msvc.zip -o zoxide.zip
+curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.6/zoxide-0.9.6-x86_64-pc-windows-msvc.zip -o zoxide.zip
 tar xf zoxide.zip -C %DESTDIR%\bin
 echo "Downloading gojq..."
-curl -sL https://github.com/itchyny/gojq/releases/download/v0.12.7/gojq_v0.12.7_windows_amd64.zip -o gojq.zip
+curl -sL https://github.com/itchyny/gojq/releases/download/v0.12.16/gojq_v0.12.16_windows_amd64.zip -o gojq.zip
 tar xf gojq.zip  --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading age..."
-curl -sL https://github.com/FiloSottile/age/releases/download/v1.0.0/age-v1.0.0-windows-amd64.zip -o age.zip
+curl -sL https://github.com/FiloSottile/age/releases/download/v1.2.0/age-v1.2.0-windows-amd64.zip -o age.zip
 tar xf age.zip --strip-components=1 -C %DESTDIR%\bin
 echo "Downloading git..."
-curl -sL https://github.com/git-for-windows/git/releases/download/v2.36.0.windows.1/MinGit-2.36.0-busybox-64-bit.zip -o mingit.zip
+curl -sL https://github.com/git-for-windows/git/releases/download/v2.47.0.windows.2/MinGit-2.47.0.2-busybox-64-bit.zip -o mingit.zip
 tar xf mingit.zip -C %DESTDIR%\mingit
 echo "Downloading clink..."
-curl -sL https://github.com/chrisant996/clink/releases/download/v1.3.15/clink.1.3.15.6e6e45.zip -o clink.zip
+curl -sL https://github.com/chrisant996/clink/releases/download/v1.7.4/clink.1.7.4.d1920c.zip -o clink.zip
 tar xf clink.zip -C %DESTDIR%\clink
 echo "Download cmake..."
 curl -sL https://github.com/Kitware/CMake/releases/download/v3.23.1/cmake-3.23.1-windows-x86_64.zip -o cmake.zip
 tar xf cmake.zip --strip-components=1 -C %DESTDIR%\cmake
-echo "Download starship..."
-curl -sL https://github.com/starship/starship/releases/download/v1.6.3/starship-x86_64-pc-windows-msvc.zip -o starship.zip
-tar xf starship.zip -C %DESTDIR%\bin
 echo "Download python..."
-curl -sL https://www.python.org/ftp/python/3.10.4/python-3.10.4-embed-amd64.zip -o python.zip
+curl -sL https://www.python.org/ftp/python/3.13.0/python-3.13.0-embed-amd64.zip -o python.zip
 tar xf python.zip -C %DESTDIR%\python
 echo "Download ninja..."
-curl -sL https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip -o ninja.zip
+curl -sL https://github.com/ninja-build/ninja/releases/download/v1.12.1/ninja-win.zip -o ninja.zip
 tar xf ninja.zip -C %DESTDIR%\bin
 echo "Download vscode cpptools..."
-curl -LsO https://github.com/microsoft/vscode-cpptools/releases/download/v1.9.8/cpptools-win64.vsix
+curl -LsO https://github.com/microsoft/vscode-cpptools/releases/download/v1.22.11/cpptools-windows-x64.vsix
 tar xf cpptools-win64.vsix --strip-components=1 -C %DESTDIR%\cpptools
+echo "Download oh my posh"
+curl -sL https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/v24.2.2/posh-windows-amd64.exe -o oh-my-posh.exe
+copy /y oh-my-posh.exe %DESTDIR%\bin
+curl -sL https://github.com/bazelbuild/bazel/releases/download/7.4.0/bazel-7.4.0-windows-x86_64.zip -o bazel.zip
+tar xf bazel.zip --strip-components=1 -C %DESTDIR%\bazel
+echo "Add oh my posh to clink"
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/oh-my-posh.lua -o %DESTDIR%\clink\scripts\oh-my-posh.lua
 echo "Setup busybox..."
 copy /y %DESTDIR%\mingit\mingw64\bin\busybox.exe %DESTDIR%\busybox\
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/windows/busybox_template.bat -o %DESTDIR%\busybox_template.bat
