@@ -105,6 +105,10 @@ if [[ $IS_OSX -eq 0 ]]; then
   curl -sL "https://github.com/sharkdp/bat/releases/download/v$BAT_VERSION/bat-v$BAT_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
   echo "Downloading vivid..."
   curl -sL "https://github.com/sharkdp/vivid/releases/download/v$VIVID_VERSION/vivid-v$VIVID_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+  echo "Downloading dust..."
+  curl -sL "https://github.com/bootandy/dust/releases/download/v$DUST_VERSION/dust-v$DUST_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+  echo "Downloading btop..."
+  curl -sL "https://github.com/aristocratos/btop/releases/download/v$BTOP_VERSION/btop-x86_64-linux-musl.tbz" | tar xfj - --strip-components=2 -C $DESTDIR
 fi
 
 echo "Downloading sd..."
@@ -127,37 +131,69 @@ if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=lsd-v$LSD_VERSION-aarch64-apple-darwin
 fi
 curl -sL "https://github.com/lsd-rs/lsd/releases/download/v$LSD_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
-
-echo "Downloading dust..."
-curl -sL "https://github.com/bootandy/dust/releases/download/v$DUST_VERSION/dust-v$DUST_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading gojq..."
-curl -sL "https://github.com/itchyny/gojq/releases/download/v$GOJQ_VERSION/gojq_v$GOJQ_VERSION_linux_amd64.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
-# https://github.com/itchyny/gojq/releases/download/v0.12.17/gojq_v0.12.17_darwin_arm64.zip
-echo "Downloading btop..."
-curl -sL "https://github.com/aristocratos/btop/releases/download/v$BTOP_VERSION/btop-x86_64-linux-musl.tbz" | tar xfj - --strip-components=2 -C $DESTDIR
+APPLICATION_NAME=gojq_v${GOJQ_VERSION}_linux_amd64
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=gojq_v${GOJQ_VERSION}_darwin_arm64
+fi
+curl -sL "https://github.com/itchyny/gojq/releases/download/v$GOJQ_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
 echo "Downloading age..."
-curl -sL "https://github.com/FiloSottile/age/releases/download/v$AGE_VERSION/age-v$AGE_VERSION-linux-amd64.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
-# https://github.com/FiloSottile/age/releases/download/v1.2.1/age-v1.2.1-darwin-arm64.tar.gz
+APPLICATION_NAME=age-v$AGE_VERSION-linux-amd64
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=age-v$AGE_VERSION-darwin-arm64
+fi
+curl -sL "https://github.com/FiloSottile/age/releases/download/v$AGE_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
 echo "Downloading zoxide..."
-curl -sL "https://github.com/ajeetdsouza/zoxide/releases/download/v$ZOXIDE_VERSION/zoxide-$ZOXIDE_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - -C $DESTDIR/bin
-# https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.6/zoxide-0.9.6-aarch64-apple-darwin.tar.gz
+APPLICATION_NAME=zoxide-$ZOXIDE_VERSION-x86_64-unknown-linux-musl
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=zoxide-$ZOXIDE_VERSION-aarch64-apple-darwin
+fi
+curl -sL "https://github.com/ajeetdsouza/zoxide/releases/download/v$ZOXIDE_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - -C $DESTDIR/bin
+
 echo "Downloading delta..."
-curl -sL "https://github.com/dandavison/delta/releases/download/$DELTA_VERSION/delta-$DELTA_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
-# https://github.com/dandavison/delta/releases/download/0.18.2/delta-0.18.2-aarch64-apple-darwin.tar.gz
+APPLICATION_NAME=delta-$DELTA_VERSION-x86_64-unknown-linux-musl
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=delta-$DELTA_VERSION-aarch64-apple-darwin
+fi
+curl -sL "https://github.com/dandavison/delta/releases/download/$DELTA_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
 echo "Downloading watchexec..."
-curl -sL "https://github.com/watchexec/watchexec/releases/download/v$WATCHEXEC_VERSION/watchexec-$WATCHEXEC_VERSION-x86_64-unknown-linux-musl.tar.xz" | tar xfJ - --strip-components=1 -C $DESTDIR/bin
-# https://github.com/watchexec/watchexec/releases/download/v2.2.1/watchexec-2.2.1-aarch64-apple-darwin.tar.xz
+APPLICATION_NAME=watchexec-$WATCHEXEC_VERSION-x86_64-unknown-linux-musl
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=watchexec-$WATCHEXEC_VERSION-aarch64-apple-darwin
+fi
+curl -sL "https://github.com/watchexec/watchexec/releases/download/v$WATCHEXEC_VERSION/$APPLICATION_NAME.tar.xz" | tar xfJ - --strip-components=1 -C $DESTDIR/bin
+
 echo "Downloading stylua..."
-curl -sL "https://github.com/JohnnyMorganz/StyLua/releases/download/v$STYLUA_VERSION/stylua-linux-x86_64-musl.zip" | bsdtar xf - -C $DESTDIR/bin
-# https://github.com/JohnnyMorganz/StyLua/releases/download/v2.0.2/stylua-macos-aarch64.zip
+APPLICATION_NAME=stylua-linux-x86_64-musl
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=stylua-macos-aarch64
+fi
+curl -sL "https://github.com/JohnnyMorganz/StyLua/releases/download/v$STYLUA_VERSION/$APPLICATION_NAME.zip" | bsdtar xf - -C $DESTDIR/bin
 chmod u+x $DESTDIR/bin/stylua
+
 echo "Downloading deno..."
+APPLICATION_NAME=deno-x86_64-unknown-linux-gnu
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=deno-aarch64-apple-darwin
+fi
 curl -Ls "https://github.com/denoland/deno/releases/download/v$DENO_VERSION/deno-x86_64-unknown-linux-gnu.zip" | bsdtar xf - -C $DESTDIR/bin
-# https://github.com/denoland/deno/releases/download/v2.1.4/deno-aarch64-apple-darwin.zip
 chmod u+x $DESTDIR/bin/deno
+
 echo "Downloading buildifier..."
-curl -Ls "https://github.com/bazelbuild/buildtools/releases/download/v$BUILDIFIER_VERSION/buildifier-linux-amd64" -o $DESTDIR/bin/buildifier
+APPLICATION_NAME=buildifier-linux-amd64
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=buildifier-darwin-arm64
+fi
+curl -Ls "https://github.com/bazelbuild/buildtools/releases/download/v$BUILDIFIER_VERSION/$APPLICATION_NAME" -o $DESTDIR/bin/buildifier
 chmod u+x $DESTDIR/bin/buildifier
-# https://github.com/bazelbuild/buildtools/releases/download/v7.3.1/buildifier-darwin-arm64
-#https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazelisk-linux-amd64
-# https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazelisk-darwin-arm64
+
+echo "Downloading bazelisk..."
+APPLICATION_NAME=bazelisk-linux-amd64
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=bazelisk-darwin-arm64
+fi
+curl -Ls "https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0//$APPLICATION_NAME" -o $DESTDIR/bin/buildifier
+chmod u+x $DESTDIR/bin/bazelisk
