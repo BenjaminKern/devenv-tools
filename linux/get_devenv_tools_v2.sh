@@ -2,19 +2,13 @@
 set -euo pipefail
 shopt -s nullglob
 
-IS_OSX=0
-
-if [[ "$(uname)" == "Darwin" ]]; then
-    IS_OSX=1
-fi
-
 # Define versions
 NVIM_VERSION="nightly"
 CLANGD_VERSION="19.1.0"
 RIPGREP_VERSION="14.1.1"
 FZF_VERSION="0.56.0"
 HEXYL_VERSION="0.15.0"
-HYPERFINE_VERSION="1.18.0"
+HYPERFINE_VERSION="1.19.0"
 FD_VERSION="10.2.0"
 BAT_VERSION="0.24.0"
 VIVID_VERSION="0.10.1"
@@ -22,7 +16,7 @@ SD_VERSION="1.0.0"
 STARSHIP_VERSION="1.21.1"
 LSD_VERSION="1.1.5"
 DUST_VERSION="1.1.1"
-GOJQ_VERSION="0.12.16"
+GOJQ_VERSION="0.12.17"
 BTOP_VERSION="1.4.0"
 AGE_VERSION="1.2.0"
 ZOXIDE_VERSION="0.9.6"
@@ -32,8 +26,17 @@ STYLUA_VERSION="0.20.0"
 DENO_VERSION="2.0.4"
 BUILDIFIER_VERSION="7.3.1"
 
-DESTDIR="$(readlink -e $1)"
-# DESTDIR="$(realpath $1)"
+IS_OSX=0
+
+DESTDIR=""
+
+if [[ "$(uname)" == "Darwin" ]]; then
+  DESTDIR="$(realpath $1)"
+  IS_OSX=1
+else
+  DESTDIR="$(readlink -e $1)"
+fi
+
 
 mkdir -p $DESTDIR/bin
 PATH=$DESTDIR/bin:$PATH
@@ -82,17 +85,13 @@ if [[ $IS_OSX -eq 1 ]]; then
 fi
 curl -sL "https://github.com/junegunn/fzf/releases/download/v$FZF_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - -C $DESTDIR/bin
 
-if [[ $IS_OSX -eq 0 ]]; then
-echo "Downloading hexyl..."
-curl -sL "https://github.com/sharkdp/hexyl/releases/download/v$HEXYL_VERSION/hexyl-v$HEXYL_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
-fi
-
 echo "Downloading hyperfine..."
 APPLICATION_NAME=hyperfine-v$HYPERFINE_VERSION-x86_64-unknown-linux-musl
 if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=hyperfine-v$HYPERFINE_VERSION-aarch64-apple-darwin
 fi
 curl -sL "https://github.com/sharkdp/hyperfine/releases/download/v$HYPERFINE_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
 echo "Downloading fd..."
 APPLICATION_NAME=fd-v$FD_VERSION-x86_64-unknown-linux-musl
 if [[ $IS_OSX -eq 1 ]]; then
@@ -122,11 +121,11 @@ if [[ $IS_OSX -eq 1 ]]; then
 fi
 curl -sL "https://github.com/lsd-rs/lsd/releases/download/v$LSD_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading gojq..."
-APPLICATION_NAME=gojq_v${GOJQ_VERSION}_linux_amd64
+APPLICATION_NAME=gojq_v${GOJQ_VERSION}_linux_amd64.tar.gz
 if [[ $IS_OSX -eq 1 ]]; then
-  APPLICATION_NAME=gojq_v${GOJQ_VERSION}_darwin_arm64
+  APPLICATION_NAME=gojq_v${GOJQ_VERSION}_darwin_arm64.zip
 fi
-curl -sL "https://github.com/itchyny/gojq/releases/download/v$GOJQ_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL "https://github.com/itchyny/gojq/releases/download/v$GOJQ_VERSION/$APPLICATION_NAME" | bsdtar xf - --strip-components=1 -C $DESTDIR/bin
 
 echo "Downloading age..."
 APPLICATION_NAME=age-v$AGE_VERSION-linux-amd64
@@ -185,7 +184,7 @@ APPLICATION_NAME=bazelisk-linux-amd64
 if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=bazelisk-darwin-arm64
 fi
-curl -Ls "https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0//$APPLICATION_NAME" -o $DESTDIR/bin/buildifier
+curl -Ls "https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/$APPLICATION_NAME" -o $DESTDIR/bin/bazelisk
 chmod u+x $DESTDIR/bin/bazelisk
 
 echo "Downloading fd ignore file..."
@@ -195,6 +194,8 @@ echo "Downloading starship.toml..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
 
 if [[ $IS_OSX -eq 0 ]]; then
+  echo "Downloading hexyl..."
+  curl -sL "https://github.com/sharkdp/hexyl/releases/download/v$HEXYL_VERSION/hexyl-v$HEXYL_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
   echo "Downloading bat..."
   curl -sL "https://github.com/sharkdp/bat/releases/download/v$BAT_VERSION/bat-v$BAT_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
   echo "Downloading vivid..."
@@ -209,7 +210,7 @@ if [[ $IS_OSX -eq 0 ]]; then
   echo "source $DESTDIR/devenv_tools.bash"
 else
   echo "Downloading devenv_tools.zsh..."
-  curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.zsh -o $DESTDIR/devenv_tools.bash
+  curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.zsh -o $DESTDIR/devenv_tools.zsh
   echo "Add the following line to ~/.zshrc"
   echo "source $DESTDIR/devenv_tools.zsh"
 fi
