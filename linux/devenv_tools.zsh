@@ -12,7 +12,7 @@ zstyle ':completion:ls:*' menu yes select
 zstyle ':completion:*:default' list-colors \
     "di=34:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
 
-PATH=$devenv_tools_dir/bin:$devenv_tools_dir/cpptools/debugAdapters/bin:$PATH
+PATH=$devenv_tools_dir/bin:$devenv_tools_dir/cpptools/debugAdapters/bin:$devenv_tools_dir/lima/bin:$PATH
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
 alias ls='lsd'

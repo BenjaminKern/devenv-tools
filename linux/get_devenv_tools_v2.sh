@@ -209,6 +209,9 @@ if [[ $IS_OSX -eq 0 ]]; then
   echo "Add the following line to ~/.bashrc"
   echo "source $DESTDIR/devenv_tools.bash"
 else
+  echo "Downloading lima..."
+  mkdir -p $DESTDIR/lima
+  curl -Ls https://github.com/lima-vm/lima/releases/download/v1.0.2/lima-1.0.2-Darwin-arm64.tar.gz | tar xfz - -C $DESTDIR/lima
   echo "Downloading devenv_tools.zsh..."
   curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.zsh -o $DESTDIR/devenv_tools.zsh
   echo "Add the following line to ~/.zshrc"
