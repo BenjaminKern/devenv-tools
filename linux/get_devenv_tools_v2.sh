@@ -4,10 +4,10 @@ shopt -s nullglob
 
 # Define versions
 NVIM_VERSION="nightly"
-CLANGD_VERSION="19.1.0"
+CLANGD_VERSION="19.1.2"
 RIPGREP_VERSION="14.1.1"
-FZF_VERSION="0.56.0"
-HEXYL_VERSION="0.15.0"
+FZF_VERSION="0.57.0"
+HEXYL_VERSION="0.16.0"
 HYPERFINE_VERSION="1.19.0"
 FD_VERSION="10.2.0"
 BAT_VERSION="0.24.0"
@@ -15,16 +15,18 @@ VIVID_VERSION="0.10.1"
 SD_VERSION="1.0.0"
 STARSHIP_VERSION="1.21.1"
 LSD_VERSION="1.1.5"
-DUST_VERSION="1.1.1"
 GOJQ_VERSION="0.12.17"
-BTOP_VERSION="1.4.0"
 AGE_VERSION="1.2.0"
 ZOXIDE_VERSION="0.9.6"
 DELTA_VERSION="0.18.2"
-WATCHEXEC_VERSION="2.2.0"
-STYLUA_VERSION="0.20.0"
-DENO_VERSION="2.0.4"
+WATCHEXEC_VERSION="2.2.1"
+STYLUA_VERSION="2.0.2"
+DENO_VERSION="2.1.4"
 BUILDIFIER_VERSION="7.3.1"
+FASTFETCH_VERSION="2.33.0"
+LIMA_VERSION="1.0.2"
+BOTTOM_VERSION="0.10.2"
+DISKUS_VERSION="0.8.0"
 
 IS_OSX=0
 
@@ -187,6 +189,34 @@ fi
 curl -Ls "https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/$APPLICATION_NAME" -o $DESTDIR/bin/bazelisk
 chmod u+x $DESTDIR/bin/bazelisk
 
+echo "Downloading fastfetch..."
+APPLICATION_NAME=fastfetch-linux-amd64
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=fastfetch-macos-universal
+fi
+curl -sL "https://github.com/fastfetch-cli/fastfetch/releases/download/$FASTFETCH_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=2 -C $DESTDIR
+
+echo "Downloading bottom..."
+APPLICATION_NAME=bottom_x86_64-unknown-linux-musl
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=bottom_aarch64-apple-darwin
+fi
+curl -sL "https://github.com/ClementTsang/bottom/releases/download/$BOTTOM_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
+echo "Downloading hexyl..."
+APPLICATION_NAME=hexyl-v$HEXYL_VERSION-x86_64-unknown-linux-musl
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=hexyl-v$HEXYL_VERSION-aarch64-apple-darwin
+fi
+curl -sL "https://github.com/sharkdp/hexyl/releases/download/v$HEXYL_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
+echo "Downloading diskus..."
+APPLICATION_NAME=diskus-v$DISKUS_VERSION-aarch64-apple-darwin
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=diskus-v$DISKUS_VERSION-x86_64-unknown-linux-musl
+fi
+curl -sL "https://github.com/sharkdp/diskus/releases/download/v$DISKUS_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
 echo "Downloading fd ignore file..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o $DESTDIR/share/nvim/.fd-ignore
 
@@ -194,16 +224,10 @@ echo "Downloading starship.toml..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
 
 if [[ $IS_OSX -eq 0 ]]; then
-  echo "Downloading hexyl..."
-  curl -sL "https://github.com/sharkdp/hexyl/releases/download/v$HEXYL_VERSION/hexyl-v$HEXYL_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
   echo "Downloading bat..."
   curl -sL "https://github.com/sharkdp/bat/releases/download/v$BAT_VERSION/bat-v$BAT_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
   echo "Downloading vivid..."
   curl -sL "https://github.com/sharkdp/vivid/releases/download/v$VIVID_VERSION/vivid-v$VIVID_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
-  echo "Downloading dust..."
-  curl -sL "https://github.com/bootandy/dust/releases/download/v$DUST_VERSION/dust-v$DUST_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
-  echo "Downloading btop..."
-  curl -sL "https://github.com/aristocratos/btop/releases/download/v$BTOP_VERSION/btop-x86_64-linux-musl.tbz" | tar xfj - --strip-components=2 -C $DESTDIR
   echo "Downloading devenv_tools.bash..."
   curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
   echo "Add the following line to ~/.bashrc"
@@ -211,7 +235,7 @@ if [[ $IS_OSX -eq 0 ]]; then
 else
   echo "Downloading lima..."
   mkdir -p $DESTDIR/lima
-  curl -Ls https://github.com/lima-vm/lima/releases/download/v1.0.2/lima-1.0.2-Darwin-arm64.tar.gz | tar xfz - -C $DESTDIR/lima
+  curl -Ls https://github.com/lima-vm/lima/releases/download/v$LIMA_VERSION/lima-$LIMA_VERSION-Darwin-arm64.tar.gz | tar xfz - -C $DESTDIR/lima
   echo "Downloading devenv_tools.zsh..."
   curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.zsh -o $DESTDIR/devenv_tools.zsh
   echo "Add the following line to ~/.zshrc"
