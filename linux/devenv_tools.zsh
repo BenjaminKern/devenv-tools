@@ -6,7 +6,7 @@ fi
 setopt nobeep autocd
 export CLICOLOR=1
 autoload -Uz compinit
-fpath+=$devenv_tools_dir/.zshfn
+fpath=($devenv_tools_dir/bin/autocomplete $devenv_tools_dir/bin/complete $devenv_tools_dir/bin/completions $fpath)
 compinit
 zstyle ':completion:ls:*' menu yes select
 zstyle ':completion:*:default' list-colors \
