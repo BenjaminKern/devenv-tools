@@ -44,6 +44,7 @@ mkdir -p $DESTDIR/bin
 PATH=$DESTDIR/bin:$PATH
 mkdir -p $DESTDIR/cpptools
 mkdir -p $DESTDIR/config
+mkdir -p $DESTDIR/zsh-autosuggestions
 mkdir -p $DESTDIR/share/nvim/sessions
 mkdir -p $DESTDIR/share/nvim/runtime/snippets
 
@@ -216,6 +217,9 @@ if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=diskus-v$DISKUS_VERSION-aarch64-apple-darwin
 fi
 curl -sL "https://github.com/sharkdp/diskus/releases/download/v$DISKUS_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
+echo "Downloading zsh-autosuggestions..."
+curl -Ls https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR/zsh-autosuggestions
 
 echo "Downloading fd ignore file..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o $DESTDIR/share/nvim/.fd-ignore
