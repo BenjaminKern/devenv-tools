@@ -99,7 +99,6 @@ if [[ $IS_OSX -eq 1 ]]; then
 fi
 curl -sL "https://github.com/sharkdp/fd/releases/download/v$FD_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
 
-
 echo "Downloading sd..."
 APPLICATION_NAME=sd-v$SD_VERSION-x86_64-unknown-linux-musl
 if [[ $IS_OSX -eq 1 ]]; then
@@ -114,11 +113,13 @@ if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=starship-aarch64-apple-darwin
 fi
 curl -sL "https://github.com/starship/starship/releases/download/v$STARSHIP_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - -C $DESTDIR/bin
+
 echo "Downloading lsd..."
 APPLICATION_NAME=lsd-v$LSD_VERSION-x86_64-unknown-linux-musl
 if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=lsd-v$LSD_VERSION-aarch64-apple-darwin
 fi
+
 curl -sL "https://github.com/lsd-rs/lsd/releases/download/v$LSD_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading gojq..."
 APPLICATION_NAME=gojq_v${GOJQ_VERSION}_linux_amd64.tar.gz
@@ -126,6 +127,7 @@ if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=gojq_v${GOJQ_VERSION}_darwin_arm64.zip
 fi
 curl -sL "https://github.com/itchyny/gojq/releases/download/v$GOJQ_VERSION/$APPLICATION_NAME" | bsdtar xf - --strip-components=1 -C $DESTDIR/bin
+chmod u+x $DESTDIR/bin/gojq
 
 echo "Downloading age..."
 APPLICATION_NAME=age-v$AGE_VERSION-linux-amd64
@@ -199,7 +201,7 @@ APPLICATION_NAME=bottom_x86_64-unknown-linux-musl
 if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=bottom_aarch64-apple-darwin
 fi
-curl -sL "https://github.com/ClementTsang/bottom/releases/download/$BOTTOM_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL "https://github.com/ClementTsang/bottom/releases/download/$BOTTOM_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - -C $DESTDIR/bin
 
 echo "Downloading hexyl..."
 APPLICATION_NAME=hexyl-v$HEXYL_VERSION-x86_64-unknown-linux-musl
@@ -209,9 +211,9 @@ fi
 curl -sL "https://github.com/sharkdp/hexyl/releases/download/v$HEXYL_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
 
 echo "Downloading diskus..."
-APPLICATION_NAME=diskus-v$DISKUS_VERSION-aarch64-apple-darwin
+APPLICATION_NAME=diskus-v$DISKUS_VERSION-x86_64-unknown-linux-musl
 if [[ $IS_OSX -eq 1 ]]; then
-  APPLICATION_NAME=diskus-v$DISKUS_VERSION-x86_64-unknown-linux-musl
+  APPLICATION_NAME=diskus-v$DISKUS_VERSION-aarch64-apple-darwin
 fi
 curl -sL "https://github.com/sharkdp/diskus/releases/download/v$DISKUS_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
 
