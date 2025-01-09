@@ -4,7 +4,6 @@ devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PATH=$devenv_tools_dir/bin:$devenv_tools_dir/cpptools/debugAdapters/bin:$PATH
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
-export LS_COLORS="$(vivid generate one-dark)"
 alias ls='lsd'
 export EDITOR=nvim
 alias cat='bat --paging=never'
@@ -75,8 +74,6 @@ rfv() (
   export http_proxy=$devenv_tools_proxy && \
   export https_proxy=$devenv_tools_proxy
 
-source $devenv_tools_dir/bin/autocomplete/bat.bash
-source $devenv_tools_dir/bin/autocomplete/fd.bash
 source $devenv_tools_dir/bin/autocomplete/hyperfine.bash
 source $devenv_tools_dir/bin/autocomplete/lsd.bash-completion
 source $devenv_tools_dir/bin/complete/rg.bash
@@ -100,4 +97,6 @@ alias find_and_replace='fd --type f -x sd'
 alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
 
 eval "$(zoxide init --cmd j bash)"
+eval "$(bat --completion zsh)"
+eval "$(fd --gen-completions bash)"
 eval "$(starship init bash)"

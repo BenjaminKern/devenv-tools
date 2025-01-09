@@ -10,8 +10,7 @@ FZF_VERSION="0.57.0"
 HEXYL_VERSION="0.16.0"
 HYPERFINE_VERSION="1.19.0"
 FD_VERSION="10.2.0"
-BAT_VERSION="0.24.0"
-VIVID_VERSION="0.10.1"
+BAT_VERSION="0.25.0"
 SD_VERSION="1.0.0"
 STARSHIP_VERSION="1.21.1"
 LSD_VERSION="1.1.5"
@@ -92,6 +91,13 @@ if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=hyperfine-v$HYPERFINE_VERSION-aarch64-apple-darwin
 fi
 curl -sL "https://github.com/sharkdp/hyperfine/releases/download/v$HYPERFINE_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
+echo "Downloading bat..."
+APPLICATION_NAME=bat-v$BAT_VERSION-x86_64-unknown-linux-musl
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=bat-v$BAT_VERSION-aarch64-apple-darwin
+fi
+curl -sL "https://github.com/sharkdp/bat/releases/download/v$BAT_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
 
 echo "Downloading fd..."
 APPLICATION_NAME=fd-v$FD_VERSION-x86_64-unknown-linux-musl
@@ -228,10 +234,6 @@ echo "Downloading starship.toml..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
 
 if [[ $IS_OSX -eq 0 ]]; then
-  echo "Downloading bat..."
-  curl -sL "https://github.com/sharkdp/bat/releases/download/v$BAT_VERSION/bat-v$BAT_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
-  echo "Downloading vivid..."
-  curl -sL "https://github.com/sharkdp/vivid/releases/download/v$VIVID_VERSION/vivid-v$VIVID_VERSION-x86_64-unknown-linux-musl.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
   echo "Downloading devenv_tools.bash..."
   curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
   echo "Add the following line to ~/.bashrc"
