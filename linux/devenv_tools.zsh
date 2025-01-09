@@ -84,4 +84,6 @@ alias find_and_replace='fd --type f -x sd'
 alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
 
 eval "$(zoxide init --cmd j zsh)"
+eval "$(bat --completion zsh)"
+eval "$(fd --gen-completions zsh)"
 eval "$(starship init zsh)"
