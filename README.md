@@ -24,3 +24,6 @@
 - [Watchexec](https://github.com/watchexec/watchexec)
 - [Stylua](https://github.com/JohnnyMorganz/StyLua)
 - [xh](https://github.com/ducaale/xh)
+
+# Snippets
+- uv init some_folder && cd some_folder && uv add debugpy && uv add 'python-lsp-server[all]'
