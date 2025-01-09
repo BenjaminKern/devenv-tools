@@ -59,6 +59,15 @@ echo "Downloading neovim snippets..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/_.snippets -o $DESTDIR/share/nvim/runtime/snippets/_.snippets
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/c.snippets -o $DESTDIR/share/nvim/runtime/snippets/c.snippets
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/cpp.snippets -o $DESTDIR/share/nvim/runtime/snippets/cpp.snippets
+echo "Downloading fd ignore file..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o $DESTDIR/share/nvim/.fd-ignore
+echo "Downloading starship.toml..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
+echo "Downloading devenv_tools.bash..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
+echo "Downloading devenv_tools.zsh..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.zsh -o $DESTDIR/devenv_tools.zsh
+
 echo "Downloading clangd..."
 APPLICATION_NAME=clangd-linux
 if [[ $IS_OSX -eq 1 ]]; then
@@ -227,26 +236,15 @@ curl -sL "https://github.com/sharkdp/diskus/releases/download/v$DISKUS_VERSION/$
 echo "Downloading zsh-autosuggestions..."
 curl -Ls https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR/zsh-autosuggestions
 
-echo "Downloading fd ignore file..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o $DESTDIR/share/nvim/.fd-ignore
-
-echo "Downloading starship.toml..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
-
-if [[ $IS_OSX -eq 0 ]]; then
-  echo "Downloading devenv_tools.bash..."
-  curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
-  echo "Add the following line to ~/.bashrc"
-  echo "source $DESTDIR/devenv_tools.bash"
-else
+if [[ $IS_OSX -eq 1 ]]; then
   echo "Downloading lima..."
   mkdir -p $DESTDIR/lima
   curl -Ls https://github.com/lima-vm/lima/releases/download/v$LIMA_VERSION/lima-$LIMA_VERSION-Darwin-arm64.tar.gz | tar xfz - -C $DESTDIR/lima
-  echo "Downloading devenv_tools.zsh..."
-  curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.zsh -o $DESTDIR/devenv_tools.zsh
-  echo "Add the following line to ~/.zshrc"
-  echo "source $DESTDIR/devenv_tools.zsh"
 fi
 
+echo "Add the following line to ~/.zshrc"
+echo "source $DESTDIR/devenv_tools.zsh"
+echo "Add the following line to ~/.bashrc"
+echo "source $DESTDIR/devenv_tools.bash"
 echo "Add the following line to ~/.config/nvim/init.lua"
 echo "require('devenv_config')"
