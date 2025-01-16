@@ -26,6 +26,9 @@ FASTFETCH_VERSION="2.33.0"
 LIMA_VERSION="1.0.2"
 BOTTOM_VERSION="0.10.2"
 DISKUS_VERSION="0.8.0"
+RUFF_VERSION="0.9.2"
+UV_VERSION="0.5.20"
+STARPLS_VERSION="0.1.21"
 
 IS_OSX=0
 
@@ -87,6 +90,28 @@ if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=ripgrep-$RIPGREP_VERSION-aarch64-apple-darwin
 fi
 curl -sL "https://github.com/BurntSushi/ripgrep/releases/download/$RIPGREP_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
+echo "Downloading ruff..."
+APPLICATION_NAME=ruff-x86_64-unknown-linux-musl
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=ruff-aarch64-apple-darwin
+fi
+curl -sL "https://github.com/astral-sh/ruff/releases/download/$RUFF_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
+echo "Downloading uv..."
+APPLICATION_NAME=uv-x86_64-unknown-linux-musl
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=uv-aarch64-apple-darwin
+fi
+curl -sL "https://github.com/astral-sh/uv/releases/download/$UV_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
+
+echo "Downloading starpls..."
+APPLICATION_NAME=starpls-linux-amd64
+if [[ $IS_OSX -eq 1 ]]; then
+  APPLICATION_NAME=starpls-darwin-arm64
+fi
+curl -sL "https://github.com/withered-magic/starpls/releases/download/v$STARPLS_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - -C $DESTDIR/bin
+
 echo "Downloading fzf..."
 APPLICATION_NAME=fzf-$FZF_VERSION-linux_amd64
 if [[ $IS_OSX -eq 1 ]]; then
