@@ -1,36 +1,15 @@
 devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 ! [[ -f $devenv_tools_dir/devenv_tools.bash ]] && return
+export EDITOR=nvim
 
 PATH=$devenv_tools_dir/bin:$PATH
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
 alias ff='nvim $(tv)'
+alias ffg='nvim $(tv text)'
 alias ls='lsd'
-export EDITOR=nvim
 alias cat='bat --paging=never'
-is_in_git_repo() {
-  git rev-parse HEAD > /dev/null 2>&1
-}
-gv() {
-  is_in_git_repo || return
-
-  local filter
-  if [ -n $@ ] && [ -f $@ ]; then
-    filter="-- $@"
-  fi
-
-  git lg $@ | \
-    fzf \
-      --ansi --no-sort --reverse --tiebreak=index \
-      --preview "f() { set -- \$(echo -- \$@ | grep -o '[a-f0-9]\{7\}'); [ \$# -eq 0 ] || git show --color=always --format=fuller \$1 $filter | delta --line-numbers --syntax-theme=OneHalfDark; }; f {}" \
-      --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
-      --preview-window=right:60%
-}
-[[ -v devenv_tools_proxy ]] && \
-  export HTTP_PROXY=$devenv_tools_proxy && \
-  export HTTPS_PROXY=$devenv_tools_proxy && \
-  export http_proxy=$devenv_tools_proxy && \
-  export https_proxy=$devenv_tools_proxy
+alias gv='tv git-log'
 
 source $devenv_tools_dir/bin/autocomplete/hyperfine.bash
 source $devenv_tools_dir/bin/autocomplete/lsd.bash-completion
@@ -54,7 +33,6 @@ alias for_all_files='fd --type f -x'
 alias find_and_replace='fd --type f -x sd'
 alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
 
-eval "$(fzf --bash)"
 eval "$(zoxide init --cmd j bash)"
 eval "$(bat --completion bash)"
 eval "$(tv init bash)"
