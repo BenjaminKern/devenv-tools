@@ -52,11 +52,12 @@ mkdir -p $DESTDIR/share/nvim/sessions
 mkdir -p $DESTDIR/share/nvim/runtime/snippets
 
 echo "Downloading nvim..."
-APPLICATION_NAME=nvim-linux64
 if [[ $IS_OSX -eq 1 ]]; then
-  APPLICATION_NAME=nvim-macos-arm64
+  curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-macos-arm64.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR
+else
+  curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR
 fi
-curl -sL "https://github.com/neovim/neovim/releases/download/$NVIM_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR
+
 echo "Downloading neovim config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o $DESTDIR/share/nvim/runtime/lua/devenv_config.lua
 echo "Downloading neovim snippets..."
