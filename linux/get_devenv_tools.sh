@@ -274,6 +274,10 @@ if [[ $IS_OSX -eq 1 ]]; then
   echo "Downloading lima..."
   mkdir -p $DESTDIR/lima
   curl -Ls https://github.com/lima-vm/lima/releases/download/v$LIMA_VERSION/lima-$LIMA_VERSION-Darwin-arm64.tar.gz | tar xfz - -C $DESTDIR/lima
+else
+  echo "Downloading hadolint"
+  curl -Ls https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 -o $DESTDIR/bin/hadolint
+  chmod u+x $DESTDIR/bin/hadolint
 fi
 
 echo "Add the following line to ~/.zshrc"

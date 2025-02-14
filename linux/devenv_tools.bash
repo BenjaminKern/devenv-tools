@@ -5,11 +5,34 @@ export EDITOR=nvim
 PATH=$devenv_tools_dir/bin:$PATH
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
-alias ff='nvim $(tv)'
-alias ffg='nvim $(tv text)'
 alias ls='lsd'
 alias cat='bat --paging=never'
-alias gv='tv git-log'
+
+is_in_git_repo() {
+  git rev-parse HEAD > /dev/null 2>&1
+}
+ff() {
+    fzf \
+      --ansi --no-sort --reverse --tiebreak=index \
+      --preview "bat --theme 1337 --style=numbers --color=always --line-range :500 {}" \
+      --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
+      --preview-window=right:60%
+}
+gv() {
+  is_in_git_repo || return
+
+  local filter
+  if [ -n $@ ] && [ -f $@ ]; then
+    filter="-- $@"
+  fi
+
+  git lg $@ | \
+    fzf \
+      --ansi --no-sort --reverse --tiebreak=index \
+      --preview "f() { set -- \$(echo -- \$@ | grep -o '[a-f0-9]\{7\}'); [ \$# -eq 0 ] || git show --color=always --format=fuller \$1 $filter | delta --line-numbers --syntax-theme=OneHalfDark; }; f {}" \
+      --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
+      --preview-window=right:60%
+}
 
 source $devenv_tools_dir/bin/autocomplete/hyperfine.bash
 source $devenv_tools_dir/bin/autocomplete/lsd.bash-completion
@@ -35,6 +58,6 @@ alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
 
 eval "$(zoxide init --cmd j bash)"
 eval "$(bat --completion bash)"
-eval "$(tv init bash)"
+eval "$(fzf --bash)"
 # eval "$(fd --gen-completions bash)"
 eval "$(starship init bash)"
