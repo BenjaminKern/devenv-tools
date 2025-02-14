@@ -7,12 +7,12 @@ export EDITOR=nvim
 setopt nobeep autocd
 export CLICOLOR=1
 autoload -Uz compinit
-fpath=($devenv_tools_dir/bin/autocomplete $devenv_tools_dir/bin/complete $devenv_tools_dir/bin/completions $fpath)
+# fpath=($devenv_tools_dir/bin/autocomplete $devenv_tools_dir/bin/complete $devenv_tools_dir/bin/completions $fpath)
 compinit
 source $devenv_tools_dir/zsh-autosuggestions/zsh-autosuggestions.zsh
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#82aaff,bg=#222436,bold,underline"
 
-PATH=$devenv_tools_dir/bin:$devenv_tools_dir/cpptools/debugAdapters/bin:$devenv_tools_dir/lima/bin:$PATH
+PATH=$devenv_tools_dir/bin:$devenv_tools_dir/lima/bin:$PATH
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
 alias ls='lsd'
@@ -58,7 +58,9 @@ ffe() {
 }
 
 eval "$(zoxide init --cmd j zsh)"
-eval "$(bat --completion zsh)"
+# eval "$(bat --completion zsh)"
 eval "$(fzf --zsh)"
-# eval "$(fd --gen-completions zsh)"
+eval "$(fd --gen-completions zsh)"
+# eval "$(rg --generate=complete-zsh)"
+eval "$(watchexec --completions zsh)"
 eval "$(starship init zsh)"

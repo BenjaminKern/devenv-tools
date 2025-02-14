@@ -43,10 +43,6 @@ ffe() {
         --bind 'enter:become(nvim {1}:{2})'
 }
 
-source $devenv_tools_dir/bin/autocomplete/hyperfine.bash
-source $devenv_tools_dir/bin/autocomplete/lsd.bash-completion
-source $devenv_tools_dir/bin/complete/rg.bash
-
 # tab completion
 bind "set completion-ignore-case on"
 bind "set completion-map-case on"
@@ -69,4 +65,5 @@ eval "$(zoxide init --cmd j bash)"
 eval "$(bat --completion bash)"
 eval "$(fzf --bash)"
 # eval "$(fd --gen-completions bash)"
+eval "$(watchexec --completions bash)"
 eval "$(starship init bash)"
