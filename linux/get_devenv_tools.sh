@@ -29,6 +29,7 @@ DISKUS_VERSION="0.8.0"
 RUFF_VERSION="0.9.2"
 UV_VERSION="0.5.20"
 STARPLS_VERSION="0.1.21"
+SHFMT_VERSION="3.10.0"
 
 IS_OSX=0
 
@@ -261,6 +262,15 @@ curl -sL "https://github.com/sharkdp/diskus/releases/download/v$DISKUS_VERSION/$
 
 echo "Downloading zsh-autosuggestions..."
 curl -Ls https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR/zsh-autosuggestions
+
+echo "Downloading shfmt..."
+APPLICATION_NAME=shfmt_v$SHFMT_VERSION-linux_amd64
+if [[ $IS_OSX -eq 1 ]]; then
+curl -sL https://github.com/mvdan/sh/releases/download/v3.10.0/shfmt_v3.10.0_darwin_arm64 -o $DESTDIR/bin/shfmt
+else
+curl -sL https://github.com/mvdan/sh/releases/download/v3.10.0/shfmt_v3.10.0_linux_amd64 -o $DESTDIR/bin/shfmt
+fi
+chmod u+x "$DESTDIR"/bin/shfmt
 
 if [[ $IS_OSX -eq 1 ]]; then
   echo "Downloading lima..."
