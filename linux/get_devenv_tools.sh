@@ -29,7 +29,6 @@ DISKUS_VERSION="0.8.0"
 RUFF_VERSION="0.9.2"
 UV_VERSION="0.5.20"
 STARPLS_VERSION="0.1.21"
-TV_VERSION="0.10.4"
 
 IS_OSX=0
 
@@ -259,13 +258,6 @@ if [[ $IS_OSX -eq 1 ]]; then
   APPLICATION_NAME=diskus-v$DISKUS_VERSION-aarch64-apple-darwin
 fi
 curl -sL "https://github.com/sharkdp/diskus/releases/download/v$DISKUS_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - --strip-components=1 -C $DESTDIR/bin
-
-echo "Downloading television..."
-APPLICATION_NAME=tv-$TV_VERSION-linux-x86_64
-if [[ $IS_OSX -eq 1 ]]; then
-  APPLICATION_NAME=tv-$TV_VERSION-macos-arm64
-fi
-curl -sL "https://github.com/alexpasmantier/television/releases/download/$TV_VERSION/$APPLICATION_NAME.tar.gz" | tar xfz - -C $DESTDIR/bin
 
 echo "Downloading zsh-autosuggestions..."
 curl -Ls https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR/zsh-autosuggestions
