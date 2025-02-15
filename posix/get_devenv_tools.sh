@@ -75,9 +75,9 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.f
 echo "Downloading starship.toml..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
 echo "Downloading devenv_tools.bash..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/posix/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
 echo "Downloading devenv_tools.zsh..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/linux/devenv_tools.zsh -o $DESTDIR/devenv_tools.zsh
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/posix/devenv_tools.zsh -o $DESTDIR/devenv_tools.zsh
 
 echo "Downloading clangd..."
 APPLICATION_NAME=clangd-linux
