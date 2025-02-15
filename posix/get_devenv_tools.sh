@@ -57,6 +57,13 @@ else
 	curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz | tar xfz - --strip-components=1 -C $DESTDIR
 fi
 
+echo "Downloading lldb..."
+if [[ $IS_OSX -eq 1 ]]; then
+        curl -sL https://github.com/BenjaminKern/llvm-binaries/releases/download/v19.1.7/lldb-aarch64-macos.tar.gz | tar xfz - -C $DESTDIR/bin
+else
+        curl -sL https://github.com/BenjaminKern/llvm-binaries/releases/download/v19.1.7/lldb-x86_64-linux.tar.gz | tar xfz - -C $DESTDIR/bin
+fi
+
 echo "Downloading neovim config..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o $DESTDIR/share/nvim/runtime/lua/devenv_config.lua
 echo "Downloading neovim snippets..."
