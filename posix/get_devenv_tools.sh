@@ -20,7 +20,7 @@ ZOXIDE_VERSION="0.9.6"
 DELTA_VERSION="0.18.2"
 WATCHEXEC_VERSION="2.2.1"
 STYLUA_VERSION="2.0.2"
-DENO_VERSION="2.1.4"
+DENO_VERSION="2.2.3"
 BUILDIFIER_VERSION="7.3.1"
 FASTFETCH_VERSION="2.33.0"
 LIMA_VERSION="1.0.2"
@@ -219,7 +219,7 @@ APPLICATION_NAME=deno-x86_64-unknown-linux-gnu
 if [[ $IS_OSX -eq 1 ]]; then
 	APPLICATION_NAME=deno-aarch64-apple-darwin
 fi
-curl -Ls "https://github.com/denoland/deno/releases/download/v$DENO_VERSION/deno-x86_64-unknown-linux-gnu.zip" | bsdtar xf - -C $DESTDIR/bin
+curl -Ls "https://github.com/denoland/deno/releases/download/v$DENO_VERSION/$APPLICATION_NAME.zip" | bsdtar xf - -C $DESTDIR/bin
 chmod u+x $DESTDIR/bin/deno
 
 echo "Downloading buildifier..."
