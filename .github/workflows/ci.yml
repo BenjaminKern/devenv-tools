@@ -115,7 +115,7 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/JohnnyMorganz/StyLua/refs/heads/main/LICENSE.md -o $GITHUB_WORKSPACE/devenv/licenses/stylua/LICENSE.md
           curl -Ls https://raw.githubusercontent.com/denoland/deno/refs/heads/main/LICENSE.md -o $GITHUB_WORKSPACE/devenv/licenses/deno/LICENSE.md
           curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-APACHE -o $GITHUB_WORKSPACE/devenv/licenses/hexyl/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-MIT -o $GITHUB_WORKSPACE/devenv/licenses/hexyl/LICENSE-APACHE
+          curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-MIT -o $GITHUB_WORKSPACE/devenv/licenses/hexyl/LICENSE-MIT
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-APACHE -o $GITHUB_WORKSPACE/devenv/licenses/typos/LICENSE-APACHE
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-MIT -o $GITHUB_WORKSPACE/devenv/licenses/typos/LICENSE-MIT
       - uses: actions/setup-go@v5
