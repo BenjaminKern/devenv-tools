@@ -179,6 +179,9 @@ jobs:
           -GNinja \
           -DCMAKE_BUILD_TYPE=Release \
           -DLLDB_INCLUDE_TESTS=OFF \
+          -DLLDB_ENABLE_LIBEDIT=OFF \
+          -DLLDB_ENABLE_CURSES=OFF \
+          -DLLDB_ENABLE_LIBXML2=OFF \
           -DLLVM_TARGETS_TO_BUILD="X86;AArch64;ARM" \
           ${{ matrix.llvm_build_options }}
       - name: Clang tools/lldb build
