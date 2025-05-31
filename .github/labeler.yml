@@ -1,8 +1,0 @@
-Feature:
- - head-branch: ['^feature']
-
-Chore:
- - head-branch: ['^chore']
-
-Bugfix:
- - head-branch: ['^bugfix']
