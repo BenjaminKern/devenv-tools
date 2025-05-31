@@ -1,0 +1,17 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: Features
+      labels:
+        - Feature
+    - title: Bugfixes
+      labels:
+        - Bugfix
+    - title: Chore
+      labels:
+        - Chore
+    - title: Other
+      labels:
+        - "*"
