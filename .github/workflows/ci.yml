@@ -216,12 +216,12 @@ jobs:
           cargo install --locked deno
           cargo install --locked hexyl
           cargo install --locked typos-cli
-      - name: Add rust tools
+      - name: Add rust tools (Ubuntu)
         if: ${{ matrix.os == 'ubuntu-latest' }}
         shell: bash
         run: |
           cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos} $GITHUB_WORKSPACE/devenv/bin
-      - name: Add rust tools
+      - name: Add rust tools (macOS)
         if: ${{ matrix.os == 'macos-latest' }}
         shell: bash
         run: |
