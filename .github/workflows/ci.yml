@@ -189,12 +189,6 @@ jobs:
         run: |
           cp build-clangd/bin/{clang-tidy,clangd,clang-format,clangd-indexer,clang-doc,lldb,lldb-dap,lldb-server} $GITHUB_WORKSPACE/devenv/bin
           cp build-clangd/lib/liblldb.* $GITHUB_WORKSPACE/devenv/lib
-      - name: Patch lldb binaries
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: |
-          patchelf --set-rpath '$ORIGIN/../lib' $GITHUB_WORKSPACE/devenv/bin/lldb
-          patchelf --set-rpath '$ORIGIN/../lib' $GITHUB_WORKSPACE/devenv/bin/lldb-dap
-          patchelf --set-rpath '$ORIGIN/../lib' $GITHUB_WORKSPACE/devenv/bin/lldb-server
       - name: Prepare rust tools configuration
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
