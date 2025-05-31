@@ -53,7 +53,7 @@ jobs:
             btop_build_options: CC=clang CXX=clang++ GPU_SUPPORT=false ADDFLAGS="-stdlib=libc++ -static -lc++abi -pthread -fuse-ld=lld"
             nvim_build_options: -GNinja -DCMAKE_C_COMPILER=clang
             nvim_package_name: nvim-linux-x86_64.tar.gz
-            llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON -DLLVM_ENABLE_LLD=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PLUGINS=OFF -DLLVM_STATIC_LINK_CXX_STDLIB=ON -DCMAKE_EXE_LINKER_FLAGS="-static -lc++abi -pthread"
+            llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON -DLLVM_ENABLE_LLD=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PLUGINS=OFF -DLLVM_STATIC_LINK_CXX_STDLIB=ON
             suffix: x86_64-linux
             uutils_features: unix
           - os: macos-latest
