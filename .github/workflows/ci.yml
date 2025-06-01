@@ -126,6 +126,7 @@ jobs:
         run: |
           echo "GO_LDFLAGS=-s -w" >> $GITHUB_ENV
       - name: Build go tools
+        if: false
         run: |
           echo $GO_LDFLAGS
           go install github.com/mikefarah/yq/v4@latest
@@ -139,13 +140,16 @@ jobs:
           go install github.com/bazelbuild/bazelisk@latest
           go install github.com/charmbracelet/vhs@latest
       - name: Add go tools
+        if: false
         shell: bash
         run: |
           cp $HOME/go/bin/{yq,actionlint,age,age-keygen,bazelisk,buildifier,dive,fzf,shfmt,vhs} $GITHUB_WORKSPACE/devenv/bin
       - name: Prepare build
+        if: false
         run: |
           mkdir btop-src neovim-src llvm-src
       - name: Download sources (oh-my-posh, btop, neovim, llvm)
+        if: false
         run: |
           git clone --depth 1 https://github.com/JanDeDobbeleer/oh-my-posh.git
           curl -Ls https://github.com/aristocratos/btop/archive/refs/tags/v1.4.3.tar.gz -o btop-src.tar.gz
@@ -155,21 +159,25 @@ jobs:
           tar xfz neovim-src.tar.gz --strip=1 -C neovim-src
           tar xfJ llvm-project.tar.xz --strip=1 -C llvm-src
       - name: Build oh-my-posh
+        if: false
         run: |
           echo $GO_LDFLAGS
           cd oh-my-posh/src
           go build -o $GITHUB_WORKSPACE/devenv/bin/oh-my-posh
       - name: Build btop
+        if: false
         run: |
           make -C btop-src ${{ matrix.btop_build_options }}
           cp btop-src/bin/btop $GITHUB_WORKSPACE/devenv/bin
       - name: Build neovim
+        if: false
         run: |
           cmake -S neovim-src/cmake.deps -B neovim-src/.deps -GNinja ${{ matrix.nvim_build_options }}
           cmake --build neovim-src/.deps
           cmake -S neovim-src -Bbuild-neovim -DCMAKE_BUILD_TYPE=Release ${{ matrix.nvim_build_options }}
           cmake --build build-neovim --target package
       - name: Add neovim tools
+        if: false
         run: |
           tar xfz build-neovim/${{ matrix.nvim_package_name }} --strip=1 -C $GITHUB_WORKSPACE/devenv
       - name: Clang tools/lldb configure
@@ -185,18 +193,21 @@ jobs:
           -DLLVM_TARGETS_TO_BUILD="X86;AArch64;ARM" \
           ${{ matrix.llvm_build_options }}
       - name: Clang tools/lldb build
+        if: false
         run: |
           cmake --build build-clangd --target clang-tidy clangd clang-format clangd-indexer clang-doc lldb lldb-dap lldb-server
       - name: Add clang tools/lldb
+        if: false
         shell: bash
         run: |
           cp build-clangd/bin/{clang-tidy,clangd,clang-format,clangd-indexer,clang-doc,lldb,lldb-dap,lldb-server} $GITHUB_WORKSPACE/devenv/bin
           cp build-clangd/lib/liblldb.* $GITHUB_WORKSPACE/devenv/lib
       - name: Prepare rust tools configuration
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: false
         run: |
           echo "RUSTFLAGS=-Clink-arg=-fuse-ld=lld" >> $GITHUB_ENV
       - name: Rust tools
+        if: false
         run: |
           echo $RUSTFLAGS
           cargo install --locked du-dust
@@ -217,12 +228,12 @@ jobs:
           cargo install --locked hexyl
           cargo install --locked typos-cli
       - name: Add rust tools (Ubuntu)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: false
         shell: bash
         run: |
           cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos} $GITHUB_WORKSPACE/devenv/bin
       - name: Add rust tools (macOS)
-        if: ${{ matrix.os == 'macos-latest' }}
+        if: false
         shell: bash
         run: |
           cp $HOME/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos} $GITHUB_WORKSPACE/devenv/bin
