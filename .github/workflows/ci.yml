@@ -31,6 +31,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: artifact-*
+          merge-multiple: true
       - name: Show workspace
         shell: bash
         run: |
@@ -50,7 +51,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         include:
           - os: ubuntu-latest
             image: ghcr.io/benjaminkern/ci-images/ubuntu/20.04:main
@@ -249,5 +250,5 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-tools-${{ matrix.suffix }}
+          name: artifact-tools
           path: devenv-tools-${{ matrix.suffix }}.tar.xz
