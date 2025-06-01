@@ -76,6 +76,7 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/devenv/{bin,lib,licenses}
           mkdir -p $GITHUB_WORKSPACE/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb}
           mkdir -p $GITHUB_WORKSPACE/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}
+          cp posix/{devenv_tools.bash,devenv_tools.zsh} $GITHUB_WORKSPACE/devenv
           curl -Ls https://raw.githubusercontent.com/mikefarah/yq/refs/heads/master/LICENSE -o $GITHUB_WORKSPACE/devenv/licenses/yq/LICENSE
           curl -Ls https://raw.githubusercontent.com/wagoodman/dive/refs/heads/main/LICENSE -o $GITHUB_WORKSPACE/devenv/licenses/dive/LICENSE
           curl -Ls https://raw.githubusercontent.com/rhysd/actionlint/refs/heads/main/LICENSE.txt -o $GITHUB_WORKSPACE/devenv/licenses/actionlint/LICENSE.txt
