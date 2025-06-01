@@ -50,7 +50,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         include:
           - os: ubuntu-latest
             image: ghcr.io/benjaminkern/ci-images/ubuntu/20.04:main
@@ -185,6 +185,7 @@ jobs:
         run: |
           tar xfz build-neovim/${{ matrix.nvim_package_name }} --strip=1 -C $GITHUB_WORKSPACE/devenv
       - name: Clang tools/lldb configure
+        if: false
         run: |
           cmake -Bbuild-clangd -S llvm-src/llvm \
           -DLLVM_ENABLE_PROJECTS="clang;lldb;clang-tools-extra" \
