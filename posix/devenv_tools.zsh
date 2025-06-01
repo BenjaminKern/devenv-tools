@@ -12,7 +12,7 @@ compinit
 source $devenv_tools_dir/zsh-autosuggestions/zsh-autosuggestions.zsh
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#82aaff,bg=#222436,bold,underline"
 
-PATH=$devenv_tools_dir/bin:$devenv_tools_dir/lima/bin:$PATH
+PATH=$devenv_tools_dir/bin:$PATH
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
 alias ls='lsd'
