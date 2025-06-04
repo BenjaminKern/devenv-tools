@@ -54,7 +54,6 @@ jobs:
             nvim_package_name: nvim-linux-x86_64.tar.gz
             llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON -DLLVM_ENABLE_LLD=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PLUGINS=OFF -DLLVM_STATIC_LINK_CXX_STDLIB=ON
             suffix: x86_64-linux
-            uutils_features: unix
             extension: ""
           - os: macos-latest
             image: null
@@ -63,7 +62,6 @@ jobs:
             nvim_package_name: nvim-macos-arm64.tar.gz
             llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON
             suffix: aarch64-macos
-            uutils_features: macos
             extension: ""
           - os: windows-2022
             image: null
@@ -72,7 +70,6 @@ jobs:
             nvim_package_name: nvim-win64.zip
             llvm_build_options: -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DLLVM_ENABLE_ZLIB=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DLLVM_PARALLEL_LINK_JOBS=1
             suffix: x86_64-windows
-            uutils_features: win
             extension: ".exe"
 
     runs-on: ${{ matrix.os }}
@@ -85,9 +82,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb,coreutils}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
+          curl -Ls https://raw.githubusercontent.com/uutils/coreutils/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/coreutils/LICENSE
           curl -Ls https://raw.githubusercontent.com/mikefarah/yq/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/yq/LICENSE
           curl -Ls https://raw.githubusercontent.com/wagoodman/dive/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/dive/LICENSE
           curl -Ls https://raw.githubusercontent.com/rhysd/actionlint/refs/heads/main/LICENSE.txt -o "$GITHUB_WORKSPACE"/devenv/licenses/actionlint/LICENSE.txt
@@ -159,6 +157,7 @@ jobs:
           git clone --depth 1 https://github.com/JanDeDobbeleer/oh-my-posh.git
           git clone --depth 1 https://github.com/aristocratos/btop.git btop-src
           git clone --depth 1 https://github.com/neovim/neovim.git neovim-src
+          git clone --depth 1 https://github.com/uutils/coreutils.git coreutils-src
           git clone --branch llvmorg-20.1.6 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
       - name: Build oh-my-posh
         if: ${{ matrix.os != 'windows-2022' }}
@@ -172,6 +171,12 @@ jobs:
           echo $env:GO_LDFLAGS
           cd oh-my-posh\src
           go build -o $env:GITHUB_WORKSPACE\devenv\bin\oh-my-posh${{ matrix.extension }}
+      - name: Build coreutils
+        if: ${{ matrix.os == 'windows-2022' }}
+        run: |
+          cd coreutils-src
+          cargo build --release --features windows
+          Copy-Item -Path .\target\release\coreutils.exe -Destination $env:GITHUB_WORKSPACE\devenv\bin\coreutils.exe
       - name: Prepare windows msvc
         if: ${{ matrix.os == 'windows-2022' }}
         run: |
