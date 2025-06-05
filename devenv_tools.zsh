@@ -1,20 +1,36 @@
+# devenv_tools.zsh - sourced only
+
 devenv_tools_dir="$(cd "$(dirname "${(%):-%N}")" &> /dev/null && pwd)"
+
 if [[ ! -f "$devenv_tools_dir/devenv_tools.zsh" ]]; then
-    return
+  echo "Warning: devenv_tools.zsh not found in $devenv_tools_dir, skipping sourcing."
+  return
 fi
+
 export EDITOR=nvim
-
-setopt nobeep autocd
 export CLICOLOR=1
-autoload -Uz compinit
-# fpath=($devenv_tools_dir/bin/autocomplete $devenv_tools_dir/bin/complete $devenv_tools_dir/bin/completions $fpath)
-compinit
-source $devenv_tools_dir/zsh-autosuggestions/zsh-autosuggestions.zsh
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#82aaff,bg=#222436,bold,underline"
-
-PATH=$devenv_tools_dir/bin:$PATH
+export STARSHIP_CONFIG="$devenv_tools_dir/config/starship.toml"
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
-export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
+
+setopt nobeep autocd share_history
+
+autoload -Uz compinit
+# fpath=(
+#   "$devenv_tools_dir/bin/autocomplete"
+#   "$devenv_tools_dir/bin/complete"
+#   "$devenv_tools_dir/bin/completions"
+#   $fpath
+# )
+compinit
+
+if [[ -f "$devenv_tools_dir/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+  source "$devenv_tools_dir/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#82aaff,bg=#222436,bold,underline"
+fi
+
+PATH="$devenv_tools_dir/bin:$PATH"
+export PATH
+
 alias ls='lsd'
 alias cat='bat --paging=never'
 alias which='whence -p'
@@ -25,28 +41,31 @@ alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
 is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
 }
+
 ff() {
-    fzf \
-      --ansi --no-sort --reverse --tiebreak=index \
-      --preview "bat --theme 1337 --style=numbers --color=always --line-range :500 {}" \
-      --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
-      --preview-window=right:60%
+  fzf \
+    --ansi --no-sort --reverse --tiebreak=index \
+    --preview "bat --theme 1337 --style=numbers --color=always --line-range :500 {}" \
+    --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
+    --preview-window=right:60%
 }
+
 gv() {
   is_in_git_repo || return
 
-  local filter
-  if [ -n $@ ] && [ -f $@ ]; then
-    filter="-- $@"
+  local filter=""
+  if [[ -n "$1" && -f "$1" ]]; then
+    filter="-- $1"
   fi
 
-  git lg $@ | \
+  git lg "$@" | \
     fzf \
       --ansi --no-sort --reverse --tiebreak=index \
       --preview "f() { set -- \$(echo -- \$@ | grep -o '[a-f0-9]\{7\}'); [ \$# -eq 0 ] || git show --color=always --format=fuller \$1 $filter | delta --line-numbers --syntax-theme=OneHalfDark; }; f {}" \
       --bind "alt-j:preview-down,alt-k:preview-up,q:abort" \
       --preview-window=right:60%
 }
+
 ffe() {
   rg --color=always --line-number --no-heading --smart-case "${*:-}" |
     fzf --ansi \
@@ -63,4 +82,4 @@ eval "$(fzf --zsh)"
 eval "$(fd --gen-completions zsh)"
 # eval "$(rg --generate=complete-zsh)"
 eval "$(watchexec --completions zsh)"
-eval "$(starship init zsh)"
+eval "$(oh-my-posh init zsh --config $devenv_tools_dir/config/xyz.omp.json)"
