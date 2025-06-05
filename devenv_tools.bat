@@ -42,6 +42,7 @@ goto :eof
 rem Inject clink and configure prompt
 "%BASE%clink\clink_x64.exe" inject
 "%BASE%clink\clink_x64.exe" config prompt use oh-my-posh
+"%BASE%clink\clink_x64.exe" set ohmyposh.theme "%BASE%config\xyz.omp.json"
 
 echo Developer environment ready!
 goto :eof
