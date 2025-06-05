@@ -1,7 +1,6 @@
 @echo off
 
 rem Prepend custom tools to PATH
-setlocal enableextensions
 set "BASE=%~dp0"
 
 rem Add directories if they exist
