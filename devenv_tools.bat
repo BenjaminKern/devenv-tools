@@ -1,5 +1,5 @@
 @echo off
-set PATH=%~dp0bin;%~dp0nvim-win64\bin;%~dp0mingit\cmd;%~dp0clink;%PATH%
+set PATH=%~dp0bin;%~dp0nvim-win64\bin;%~dp0mingit\cmd;%~dp0clink;%~dp0coreutils;%PATH%
 set CLINK_PATH=%~dp0clink\scripts
 doskey j=zoxide query $*
 doskey ff=fzf $*
@@ -18,4 +18,5 @@ goto :eof
 
 :clink
 %~dp0clink\clink_x64.exe inject
+%~dp0clink\clink_x64.exe config prompt use oh-my-posh
 goto :eof
