@@ -31,6 +31,7 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nv
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/cpp.json -o "$DESTDIR"/share/nvim/runtime/snippets/cpp.json
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o "$DESTDIR"/share/nvim/.fd-ignore
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o "$DESTDIR"/config/starship.toml
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/refs/heads/main/.config/xyz.omp.json -o "$DESTDIR"/config/xyz.omp.json
 
 echo "Downloading devenv_tools.bash..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/posix/devenv_tools.bash -o "$DESTDIR"/devenv_tools.bash

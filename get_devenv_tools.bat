@@ -21,11 +21,13 @@ echo Downloading devenv tools...
 curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/v0.0.3/devenv-tools-x86_64-windows.tar.xz | tar xf - --strip=1 -C "%DESTDIR%"
 
 echo Downloading configs...
+mkdir "%DESTDIR%\config"
 mkdir "%DESTDIR%\nvim-win64\share\nvim\runtime\snippets"
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o "%DESTDIR%\nvim-win64\share\nvim\runtime\lua\devenv_config.lua"
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/all.json -o "%DESTDIR%\nvim-win64\share\nvim\runtime\snippets\all.json"
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/cpp.json -o "%DESTDIR%\nvim-win64\share\nvim\runtime\snippets\cpp.json"
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o "%DESTDIR%\nvim-win64\share\nvim\.fd-ignore"
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/refs/heads/main/.config/xyz.omp.json -o "%DESTDIR%\config\xyz.omp.json"
 
 if not exist "%DESTDIR%\mingit" mkdir "%DESTDIR%\mingit"
 echo Downloading mingit...
