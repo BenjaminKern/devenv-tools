@@ -82,9 +82,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb,coreutils}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb,coreutils,gontlm-proxy}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
+          curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
           curl -Ls https://raw.githubusercontent.com/uutils/coreutils/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/coreutils/LICENSE
           curl -Ls https://raw.githubusercontent.com/mikefarah/yq/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/yq/LICENSE
           curl -Ls https://raw.githubusercontent.com/wagoodman/dive/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/dive/LICENSE
@@ -158,6 +159,7 @@ jobs:
           git clone --depth 1 https://github.com/aristocratos/btop.git btop-src
           git clone --depth 1 https://github.com/neovim/neovim.git neovim-src
           git clone --depth 1 https://github.com/uutils/coreutils.git coreutils-src
+          git clone --depth 1 https://github.com/bdwyertech/gontlm-proxy.git gontlm-proxy-src
           git clone --branch llvmorg-20.1.6 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
       - name: Build oh-my-posh
         if: ${{ matrix.os != 'windows-2022' }}
@@ -171,6 +173,12 @@ jobs:
           echo $env:GO_LDFLAGS
           cd oh-my-posh\src
           go build -o $env:GITHUB_WORKSPACE\devenv\bin\oh-my-posh${{ matrix.extension }}
+      - name: Build gontlm-proxy
+        if: ${{ matrix.os == 'windows-2022' }}
+        run: |
+          echo $env:GO_LDFLAGS
+          cd gontlm-proxy-src
+          go build -o $env:GITHUB_WORKSPACE\devenv\bin\gontlm-proxy${{ matrix.extension }}
       - name: Build coreutils
         if: ${{ matrix.os == 'windows-2022' }}
         run: |
