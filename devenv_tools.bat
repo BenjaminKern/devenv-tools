@@ -1,22 +1,48 @@
 @echo off
-set PATH=%~dp0bin;%~dp0nvim-win64\bin;%~dp0mingit\cmd;%~dp0clink;%~dp0coreutils;%PATH%
-set CLINK_PATH=%~dp0clink\scripts
+
+rem Prepend custom tools to PATH
+setlocal enableextensions
+set "BASE=%~dp0"
+
+rem Add directories if they exist
+if exist "%BASE%bin" set "PATH=%BASE%bin;%PATH%"
+if exist "%BASE%nvim-win64\bin" set "PATH=%BASE%nvim-win64\bin;%PATH%"
+if exist "%BASE%mingit\cmd" set "PATH=%BASE%mingit\cmd;%PATH%"
+if exist "%BASE%clink" set "PATH=%BASE%clink;%PATH%"
+if exist "%BASE%coreutils" set "PATH=%BASE%coreutils;%PATH%"
+
+set "CLINK_PATH=%BASE%clink\scripts"
+
+rem Define doskey macros for the session
 doskey j=zoxide query $*
 doskey ff=fzf $*
 
+rem Check for vswhere.exe
+if not exist "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" (
+    color 4f
+    echo ERROR: vswhere.exe not found at expected location
+    title ERROR
+    goto :eof
+)
+
+rem Find latest Visual Studio installation and call devcmd
 for /f "usebackq delims=" %%i in (`"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -latest -property installationPath`) do (
   if exist "%%i\Common7\Tools\vsdevcmd.bat" (
-    call "%%i\Common7\Tools\vsdevcmd.bat" %*
+    call "%%i\Common7\Tools\vsdevcmd.bat"
     goto clink
   )
 )
 
+rem VS not found — show error
 color 4f
-echo ERROR: ¯\_(ツ)_/¯
+echo ERROR: Visual Studio installation not found ¯\_(ツ)_/¯
 title ERROR
 goto :eof
 
 :clink
-%~dp0clink\clink_x64.exe inject
-%~dp0clink\clink_x64.exe config prompt use oh-my-posh
+rem Inject clink and configure prompt
+"%BASE%clink\clink_x64.exe" inject
+"%BASE%clink\clink_x64.exe" config prompt use oh-my-posh
+
+echo Developer environment ready!
 goto :eof
