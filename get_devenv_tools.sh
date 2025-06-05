@@ -2,6 +2,11 @@
 set -euo pipefail
 shopt -s nullglob
 
+if [[ -z "${1:-}" ]]; then
+  echo "Usage: $0 <install-dir>"
+  exit 1
+fi
+
 echo "Downloading tools..."
 if [[ "$(uname)" == "Darwin" ]]; then
   DESTDIR="$(realpath "$1")"
