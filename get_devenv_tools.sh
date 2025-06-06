@@ -34,9 +34,9 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/st
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/refs/heads/main/.config/xyz.omp.json -o "$DESTDIR"/config/xyz.omp.json
 
 echo "Downloading devenv_tools.bash..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/posix/devenv_tools.bash -o "$DESTDIR"/devenv_tools.bash
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/devenv_tools.bash -o "$DESTDIR"/devenv_tools.bash
 echo "Downloading devenv_tools.zsh..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/posix/devenv_tools.zsh -o "$DESTDIR"/devenv_tools.zsh
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/devenv_tools.zsh -o "$DESTDIR"/devenv_tools.zsh
 
 echo "Downloading zsh-autosuggestions..."
 curl -Ls https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz | tar xfz - --strip-components=1 -C "$DESTDIR"/zsh-autosuggestions
