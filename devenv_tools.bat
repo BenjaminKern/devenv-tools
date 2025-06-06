@@ -1,20 +1,6 @@
 @echo off
 
-rem Prepend custom tools to PATH
 set "BASE=%~dp0"
-
-rem Add directories if they exist
-if exist "%BASE%bin" set "PATH=%BASE%bin;%PATH%"
-if exist "%BASE%nvim-win64\bin" set "PATH=%BASE%nvim-win64\bin;%PATH%"
-if exist "%BASE%mingit\cmd" set "PATH=%BASE%mingit\cmd;%PATH%"
-if exist "%BASE%clink" set "PATH=%BASE%clink;%PATH%"
-if exist "%BASE%busybox" set "PATH=%BASE%busybox;%PATH%"
-
-set "CLINK_PATH=%BASE%clink\scripts"
-
-rem Define doskey macros for the session
-doskey j=zoxide query $*
-doskey ff=fzf $*
 
 rem Check for vswhere.exe
 if not exist "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" (
@@ -39,6 +25,14 @@ title ERROR
 goto :eof
 
 :clink
+rem Prepend custom tools to PATH
+set PATH=%BASE%bin;%BASE%nvim-win64\bin;%BASE%mingit\cmd;%BASE%clink;%BASE%busybox;%PATH%
+set "CLINK_PATH=%BASE%clink\scripts"
+
+rem Define doskey macros for the session
+doskey j=zoxide query $*
+doskey ff=fzf $*
+
 rem Inject clink and configure prompt
 "%BASE%clink\clink_x64.exe" inject
 "%BASE%clink\clink_x64.exe" config prompt use oh-my-posh
