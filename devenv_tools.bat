@@ -8,7 +8,7 @@ if exist "%BASE%bin" set "PATH=%BASE%bin;%PATH%"
 if exist "%BASE%nvim-win64\bin" set "PATH=%BASE%nvim-win64\bin;%PATH%"
 if exist "%BASE%mingit\cmd" set "PATH=%BASE%mingit\cmd;%PATH%"
 if exist "%BASE%clink" set "PATH=%BASE%clink;%PATH%"
-if exist "%BASE%coreutils" set "PATH=%BASE%coreutils;%PATH%"
+if exist "%BASE%busybox" set "PATH=%BASE%busybox;%PATH%"
 
 set "CLINK_PATH=%BASE%clink\scripts"
 

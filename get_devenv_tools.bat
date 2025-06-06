@@ -35,6 +35,9 @@ curl -sL https://github.com/git-for-windows/git/releases/download/v2.49.0.window
 tar xf "%TEMP%\mingit.zip" -C "%DESTDIR%\mingit"
 del "%TEMP%\mingit.zip"
 
+if not exist "%DESTDIR%\busybox" mkdir "%DESTDIR%\busybox"
+copy /y %DESTDIR%\mingit\mingw64\bin\busybox.exe "%DESTDIR%\busybox\"
+
 if not exist "%DESTDIR%\clink" mkdir "%DESTDIR%\clink"
 echo Downloading clink...
 curl -sL https://github.com/chrisant996/clink/releases/download/v1.7.19/clink.1.7.19.d8a218.zip -o "%TEMP%\clink.zip"
@@ -47,8 +50,8 @@ for %%C in (%CMDLIST%) do (
     (
         echo @echo off
         echo setlocal
-        echo %%~dp0\coreutils.exe %%~n0 %%*
-    ) > "%DESTDIR%\bin\%%C.bat"
+        echo %%~dp0\busybox.exe %%~n0 %%*
+    ) > "%DESTDIR%\busybox\%%C.bat"
 )
 
 echo.
