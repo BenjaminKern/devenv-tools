@@ -26,7 +26,7 @@ goto :eof
 
 :clink
 rem Prepend custom tools to PATH
-set PATH=%BASE%bin;%BASE%nvim-win64\bin;%BASE%mingit\cmd;%BASE%clink;%BASE%busybox;%PATH%
+set PATH=%BASE%bin;%BASE%nvim-win64\bin;%BASE%mingit\cmd;%BASE%clink;%BASE%busybox;%BASE%zig;%PATH%
 set "CLINK_PATH=%BASE%clink\scripts"
 
 rem Define doskey macros for the session
