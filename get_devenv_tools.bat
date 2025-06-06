@@ -41,7 +41,7 @@ curl -sL https://github.com/chrisant996/clink/releases/download/v1.7.19/clink.1.
 tar xf "%TEMP%\clink.zip" -C "%DESTDIR%\clink"
 del "%TEMP%\clink.zip"
 
-set CMDLIST=cat cksum clear cp ls mv rm
+set CMDLIST=cat cksum clear cp ls mv rm base64 cut env head tail md5sum mktemp realpath readlink sha256sum sleep split tee touch whoami yes wc
 
 for %%C in (%CMDLIST%) do (
     (
