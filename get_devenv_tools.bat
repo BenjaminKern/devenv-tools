@@ -50,7 +50,7 @@ curl -sL https://ziglang.org/download/0.14.1/zig-x86_64-windows-0.14.1.zip -o "%
 tar xf "%TEMP%\zig.zip" --strip=1 -C "%DESTDIR%\zig"
 del "%TEMP%\zig.zip"
 
-set CMDLIST=cat cksum clear cp ls mv rm base64 cut env head tail md5sum mktemp realpath readlink sha256sum sleep split tee touch whoami yes wc pwd
+set CMDLIST=cat cksum clear cp ls mv rm base64 cut env head tail md5sum mktemp realpath readlink sha256sum sleep split tee touch whoami yes wc pwd unzip
 
 for %%C in (%CMDLIST%) do (
     (
