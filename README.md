@@ -25,5 +25,17 @@
 - [Stylua](https://github.com/JohnnyMorganz/StyLua)
 - [xh](https://github.com/ducaale/xh)
 
-# Snippets
-- uv init some_folder && cd some_folder && uv add debugpy && uv add 'python-lsp-server[all]'
+# Python
+
+```sh
+uv tool install debugpy
+uv tool install basedpyright
+```
+
+# Random
+
+- https://github.blog/engineering/infrastructure/improve-git-monorepo-performance-with-a-file-system-monitor/
+
+```sh
+git config core.fsmonitor true
+git config core.untrackedcache true
