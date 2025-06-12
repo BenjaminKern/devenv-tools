@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-set -x
 
 # === Versions ===
 GIT_VERSION="2.49.0"
@@ -11,6 +10,8 @@ EXPAT_VERSION="2.7.1"
 
 BUILD_DIR="$PWD/git-build"
 INSTALL_DIR="$BUILD_DIR/install"
+TAR_NAME="git-${GIT_VERSION}-static.tar.gz"
+TAR_PATH="$(dirname "$INSTALL_DIR")/$TAR_NAME"
 
 # Clean start
 rm -rf "$BUILD_DIR"
@@ -51,11 +52,10 @@ mkdir -p git-src
 curl -sL "https://github.com/git/git/archive/refs/tags/v${GIT_VERSION}.tar.gz" | tar xfz - --strip=1 -C git-src
 cd git-src
 
-# TODO: make install target correct
 make -j6 NO_TCLTK=YesPlease NO_GETTEXT=YesPlease NO_OPENSSL=YesPlease \
   CURLDIR="$INSTALL_DIR" ZLIB_PATH="$INSTALL_DIR" EXPAT_PATH="$INSTALL_DIR" \
+  prefix='/git' NO_INSTALL_HARDLINKS=YesPlease \
   CURL_LDFLAGS="-L$INSTALL_DIR/install/lib -lcurl -lwolfssl -lm" DESTDIR="$INSTALL_DIR" install
 
-echo "✅ Git static build complete!"
-ls -lh "$INSTALL_DIR/bin/git"
-"$INSTALL_DIR/bin/git" --version
+tar -C "$INSTALL_DIR" -czf "$TAR_PATH" git
+echo "📦 Archive created at: $TAR_PATH"
