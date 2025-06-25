@@ -32,30 +32,30 @@ cmake -S expat-src  -Bbuild-expat -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INS
 cmake --build build-expat
 cmake --install build-expat
 
-echo "==> Building WolfSSL with OpenSSL compatibility..."
-mkdir -p wolfssl-src
-curl -sL "https://github.com/wolfSSL/wolfssl/archive/refs/tags/v${WOLFSSL_VERSION}-stable.tar.gz" | tar xfz - --strip=1 -C wolfssl-src
-cmake -Swolfssl-src -Bbuild-wolfssl -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DBUILD_SHARED_LIBS=OFF -DWOLFSSL_CURL=ON
-cmake --build build-wolfssl
-cmake --install build-wolfssl
+echo "==> Building OpenSSL ..."
+mkdir -p openssl-src
+curl -sL https://github.com/viaduck/openssl-cmake/archive/refs/heads/v3.tar.gz  | tar xfz - --strip=1 -C openssl-src
+cmake -Sopenssl-src -Bbuild-openssl -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DBUILD_SHARED_LIBS=OFF -DBUILD_OPENSSL=ON -DOPENSSL_BUILD_VERSION=3.3.3
+cmake --build build-openssl
+cmake --install build-openssl
 
-echo "==> Building curl with WolfSSL and static libraries..."
+echo "==> Building curl and static libraries..."
 mkdir -p curl-src
 curl -sL "https://curl.se/download/curl-${CURL_VERSION}.tar.gz" | tar xfz - --strip=1 -C curl-src
-cmake  -Scurl-src -Bbuild-curl -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DBUILD_SHARED_LIBS=OFF -DCURL_USE_LIBPSL=OFF -DCURL_USE_WOLFSSL=ON
-# cmake  -Scurl-src -Bbuild-curl -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DBUILD_SHARED_LIBS=OFF -DCURL_USE_LIBPSL=OFF -DCURL_USE_WOLFSSL=ON -DCURL_USE_SECTRANSP=ON
+cmake  -Scurl-src -Bbuild-curl -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DBUILD_SHARED_LIBS=OFF -DCURL_USE_LIBPSL=OFF -DCURL_DISABLE_NTLM=ON
 cmake --build build-curl
 cmake --install build-curl
 
-echo "==> Building Git statically with curl, zlib, expat, and WolfSSL..."
+echo "==> Building Git statically with curl, zlib, expat, and openssl..."
 mkdir -p git-src
 curl -sL "https://github.com/git/git/archive/refs/tags/v${GIT_VERSION}.tar.gz" | tar xfz - --strip=1 -C git-src
 cd git-src
 
-make -j6 NO_TCLTK=YesPlease NO_GETTEXT=YesPlease NO_OPENSSL=YesPlease \
+CURL_BUILD_FLAGS=$("$INSTALL_DIR"/bin/curl-config --libs)
+make -j6 NO_TCLTK=YesPlease NO_GETTEXT=YesPlease \
   CURLDIR="$INSTALL_DIR" ZLIB_PATH="$INSTALL_DIR" EXPAT_PATH="$INSTALL_DIR" \
   prefix='/git' NO_INSTALL_HARDLINKS=YesPlease \
-  CURL_LDFLAGS="-L$INSTALL_DIR/install/lib -lcurl -lwolfssl -lm" DESTDIR="$INSTALL_DIR" install
+  CURL_LDFLAGS="$CURL_BUILD_FLAGS" DESTDIR="$INSTALL_DIR" install
 
 # NOTE:
 # set GIT_TEMPLATE_DIR properly
