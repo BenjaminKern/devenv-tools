@@ -39,6 +39,8 @@ cmake -Sopenssl-src -Bbuild-openssl -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_I
 cmake --build build-openssl
 cmake --install build-openssl
 
+rm "$INSTALL_DIR"/lib/*.so
+
 echo "==> Building curl and static libraries..."
 mkdir -p curl-src
 curl -sL "https://curl.se/download/curl-${CURL_VERSION}.tar.gz" | tar xfz - --strip=1 -C curl-src
@@ -52,7 +54,7 @@ curl -sL "https://github.com/git/git/archive/refs/tags/v${GIT_VERSION}.tar.gz" |
 cd git-src
 
 CURL_BUILD_FLAGS=$("$INSTALL_DIR"/bin/curl-config --libs)
-make -j6 NO_TCLTK=YesPlease NO_GETTEXT=YesPlease \
+make -j6 NO_TCLTK=YesPlease NO_GETTEXT=YesPlease NO_OPENSSL=YesPlease USE_CURL_FOR_IMAP_SEND=YesPlease \
   CURLDIR="$INSTALL_DIR" ZLIB_PATH="$INSTALL_DIR" EXPAT_PATH="$INSTALL_DIR" \
   prefix='/git' NO_INSTALL_HARDLINKS=YesPlease \
   CURL_LDFLAGS="$CURL_BUILD_FLAGS" DESTDIR="$INSTALL_DIR" install
