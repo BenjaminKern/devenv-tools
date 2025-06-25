@@ -17,8 +17,12 @@ where tar >nul 2>&1 || (
     exit /b 1
 )
 
+if not exist "%DESTDIR%" mkdir "%DESTDIR%"
+
 echo Downloading devenv tools...
-curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/v0.0.5/devenv-tools-x86_64-windows.tar.xz | tar xf - --strip=1 -C "%DESTDIR%"
+curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/v0.0.5/devenv-tools-x86_64-windows.tar.xz -o "%TEMP%\devenv-tools-x86_64-windows.tar.xz"
+tar xf "%TEMP%\devenv-tools-x86_64-windows.tar.xz" --strip=1 -C "%DESTDIR%"
+del "%TEMP%\devenv-tools-x86_64-windows.tar.xz"
 
 echo Downloading configs...
 mkdir "%DESTDIR%\config"
