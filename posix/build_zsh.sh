@@ -10,7 +10,7 @@ ZLIB_VERSION="1.3"
 
 BUILD_DIR="$PWD/zsh_build"
 PREFIX_DIR="$PWD/zsh_static"
-NUM_CORES=$(nproc || sysctl -n hw.ncpu)
+NUM_CORES=$(nproc)
 
 mkdir -p "$BUILD_DIR" "$PREFIX_DIR"
 cd "$BUILD_DIR"
@@ -91,7 +91,7 @@ build_zsh() {
 
   make -j"$NUM_CORES" all
 
-  make install.bin install.modules install.fns install.headers
+  make install.bin install.modules install.fns
   cd ..
 }
 
@@ -111,8 +111,8 @@ build_zsh
 
 # === DONE ===
 
-echo
-echo "✅ Static Zsh build complete!"
-echo "Binary: $PREFIX_DIR/bin/zsh"
-echo "Run:    $PREFIX_DIR/bin/zsh --version"
+tar cfz zsh-${ZSH_VERSION}-static.tar.gz -C "$PREFIX_DIR" bin/zsh share/terminfo/x
+
+echo "📦 Static Zsh Archive created"
+echo "Set TERMINFO to {prefix}/share/terminfo"
 
