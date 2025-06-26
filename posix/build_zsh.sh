@@ -83,11 +83,11 @@ build_zsh() {
     PCRE_CFLAGS="-I$PREFIX_DIR/include" \
     PCRE_LIBS="-L$PREFIX_DIR/lib -lpcre2-8" \
     --with-curses-terminfo \
-    --enable-fndir=$PREFIX_DIR/share/zsh/functions \
-    --enable-scriptdir=$PREFIX_DIR/bin \
-    --enable-site-fndir=$PREFIX_DIR/share/zsh/site-functions \
-    --enable-site-scriptdir=$PREFIX_DIR/share/zsh/scripts \
-    --enable-etcdir=$PREFIX_DIR/etc
+    --disable-etcdir \
+    --disable-fndir \
+    --disable-scriptdir \
+    --disable-site-fndir \
+    --disable-site-scriptdir
 
   make -j"$NUM_CORES" all
 

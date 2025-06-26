@@ -59,9 +59,6 @@ make -j6 NO_TCLTK=YesPlease NO_GETTEXT=YesPlease NO_OPENSSL=YesPlease USE_CURL_F
   prefix='/git' NO_INSTALL_HARDLINKS=YesPlease \
   CURL_LDFLAGS="$CURL_BUILD_FLAGS" DESTDIR="$INSTALL_DIR" install
 
-# NOTE:
-# set GIT_TEMPLATE_DIR properly
-
 tar -C "$INSTALL_DIR" -czf "$TAR_PATH" git
 echo "📦 Archive created at: $TAR_PATH"
 echo "Set GIT_EXEC_PATH to {prefix}/git/libexec/git-core"
