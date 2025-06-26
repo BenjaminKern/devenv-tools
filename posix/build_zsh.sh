@@ -17,10 +17,9 @@ cd "$BUILD_DIR"
 
 export CC=gcc
 export CFLAGS="-static -O2"
-export LDFLAGS="-static"
 export PKG_CONFIG_PATH="$PREFIX_DIR/lib/pkgconfig"
 export CPPFLAGS="-I$PREFIX_DIR/include"
-export LDFLAGS="$LDFLAGS -L$PREFIX_DIR/lib"
+export LDFLAGS="-L$PREFIX_DIR/lib"
 
 # === FUNCTIONS ===
 
@@ -28,7 +27,7 @@ build_zlib() {
   curl -LO https://github.com/madler/zlib/releases/download/v${ZLIB_VERSION}/zlib-${ZLIB_VERSION}.tar.xz
   tar -xf zlib-${ZLIB_VERSION}.tar.xz
   cd zlib-${ZLIB_VERSION}
-  ./configure --prefix="$PREFIX_DIR" --static
+  ./configure --prefix="$PREFIX_DIR"
   make -j"$NUM_CORES"
   make install
   cd ..
@@ -44,8 +43,7 @@ build_ncurses() {
     --with-normal \
     --without-shared \
     --enable-widec \
-    --with-pkg-config-libdir="$PREFIX_DIR/lib/pkgconfig" \
-    --enable-static
+    --with-pkg-config-libdir="$PREFIX_DIR/lib/pkgconfig"
   make -j"$NUM_CORES"
   make install
   cd ..
@@ -57,7 +55,6 @@ build_pcre2() {
   cd pcre2-${PCRE2_VERSION}
   ./configure \
     --prefix="$PREFIX_DIR" \
-    --enable-static \
     --disable-shared \
     --enable-pcre2-8 \
     --enable-pcre2-16 \
@@ -77,7 +74,6 @@ build_zsh() {
   ./configure \
     --prefix="$PREFIX_DIR" \
     --disable-dynamic \
-    --enable-static \
     --enable-multibyte \
     --enable-pcre \
     PCRE_CFLAGS="-I$PREFIX_DIR/include" \
