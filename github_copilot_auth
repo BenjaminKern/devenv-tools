@@ -1,0 +1,367 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.8"
+# dependencies = [
+#     "requests",
+# ]
+# ///
+"""
+GitHub Copilot OAuth Authentication Script
+
+This script authenticates with GitHub Copilot using the same OAuth device flow
+that the VSCode Copilot extension uses, and creates the necessary configuration files.
+
+Usage:
+    ./github_copilot_auth.py
+"""
+
+import json
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
+from contextlib import contextmanager
+from pathlib import Path
+from typing import Dict, NamedTuple, Optional
+
+import requests
+
+
+class AuthConfig(NamedTuple):
+    """Configuration for GitHub Copilot authentication."""
+
+    client_id: str = "Iv1.b507a08c87ecfe98"
+    device_code_url: str = "https://github.com/login/device/code"
+    access_token_url: str = "https://github.com/login/oauth/access_token"
+    user_api_url: str = "https://api.github.com/user"
+    scope: str = "read:user"
+    timeout: int = 600  # 10 minutes
+    max_retries: int = 3
+
+
+class DeviceFlowResult(NamedTuple):
+    """Result from device flow initiation."""
+
+    device_code: str
+    user_code: str
+    verification_uri: str
+    interval: int
+
+
+class GitHubCopilotAuthError(Exception):
+    """Custom exception for authentication errors."""
+
+    pass
+
+
+class GitHubCopilotAuth:
+    """Handles GitHub Copilot OAuth authentication using device flow."""
+
+    def __init__(self, config_dir: Optional[Path] = None):
+        """Initialize the authenticator."""
+        self.config = AuthConfig()
+        self.config_dir = config_dir or Path.home() / ".config" / "github-copilot"
+        self.hosts_file = self.config_dir / "hosts.json"
+        self.apps_file = self.config_dir / "apps.json"
+
+        # Configure session with retries and timeouts
+        self.session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(
+            max_retries=requests.packages.urllib3.util.retry.Retry(
+                total=self.config.max_retries,
+                backoff_factor=1,
+                status_forcelist=[429, 500, 502, 503, 504],
+            )
+        )
+        self.session.mount("https://", adapter)
+        self.session.headers.update(
+            {"Accept": "application/json", "User-Agent": "GitHubCopilotAuth/2.0"}
+        )
+
+    @contextmanager
+    def _handle_request_errors(self, operation: str):
+        """Context manager for consistent error handling."""
+        try:
+            yield
+        except requests.exceptions.Timeout:
+            raise GitHubCopilotAuthError(f"{operation}: Request timed out")
+        except requests.exceptions.ConnectionError:
+            raise GitHubCopilotAuthError(f"{operation}: Network connection failed")
+        except requests.exceptions.HTTPError as e:
+            raise GitHubCopilotAuthError(
+                f"{operation}: HTTP error {e.response.status_code}"
+            )
+        except requests.exceptions.RequestException as e:
+            raise GitHubCopilotAuthError(f"{operation}: Request failed - {e}")
+
+    def _make_request(
+        self, method: str, url: str, timeout: int = 30, **kwargs
+    ) -> requests.Response:
+        """Make HTTP request with consistent error handling."""
+        with self._handle_request_errors(f"{method.upper()} {url}"):
+            response = self.session.request(method, url, timeout=timeout, **kwargs)
+            response.raise_for_status()
+            return response
+
+    def start_device_flow(self) -> DeviceFlowResult:
+        """Start the OAuth device flow."""
+        print("🚀 Starting GitHub Copilot OAuth device flow...")
+
+        data = {"client_id": self.config.client_id, "scope": self.config.scope}
+
+        response = self._make_request("POST", self.config.device_code_url, data=data)
+        result = response.json()
+
+        try:
+            device_flow = DeviceFlowResult(
+                device_code=result["device_code"],
+                user_code=result["user_code"],
+                verification_uri=result["verification_uri"],
+                interval=result.get("interval", 5),
+            )
+        except KeyError as e:
+            raise GitHubCopilotAuthError(f"Unexpected response format: missing {e}")
+
+        self._display_auth_instructions(device_flow)
+        return device_flow
+
+    def _display_auth_instructions(self, flow: DeviceFlowResult) -> None:
+        """Display authentication instructions to user."""
+        print("✅ Device flow initiated successfully!")
+        print(f"📋 User code: {flow.user_code}")
+        print(f"🌐 Verification URL: {flow.verification_uri}")
+        print()
+        print("📝 Please follow these steps:")
+        print(f"   1. Open your browser and go to: {flow.verification_uri}")
+        print(f"   2. Enter the user code: {flow.user_code}")
+        print("   3. Authorize the application")
+        print()
+
+    def poll_for_token(self, device_code: str, interval: int) -> str:
+        """Poll for the access token with timeout."""
+        print("🔄 Polling for access token...")
+
+        data = {
+            "client_id": self.config.client_id,
+            "device_code": device_code,
+            "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+        }
+
+        def _poll() -> str:
+            """Internal polling function."""
+            current_interval = interval
+            start_time = time.time()
+
+            while time.time() - start_time < self.config.timeout:
+                try:
+                    response = self._make_request(
+                        "POST", self.config.access_token_url, data=data
+                    )
+                    result = response.json()
+
+                    if "access_token" in result:
+                        print("✅ Access token obtained successfully!")
+                        return result["access_token"]
+
+                    error = result.get("error", "unknown_error")
+
+                    if error == "authorization_pending":
+                        elapsed = int(time.time() - start_time)
+                        print(f"⏳ Waiting for authorization... ({elapsed}s elapsed)")
+                    elif error == "slow_down":
+                        print("⏸️  Slowing down polling rate...")
+                        current_interval += 5
+                    elif error == "expired_token":
+                        raise GitHubCopilotAuthError(
+                            "Device code expired. Please run the script again."
+                        )
+                    elif error == "access_denied":
+                        raise GitHubCopilotAuthError("Authorization was denied.")
+                    else:
+                        raise GitHubCopilotAuthError(f"OAuth error: {error}")
+
+                    time.sleep(current_interval)
+
+                except GitHubCopilotAuthError:
+                    raise
+                except Exception as e:
+                    print(f"⚠️  Polling error: {e}")
+                    time.sleep(current_interval)
+
+            raise GitHubCopilotAuthError("Timeout waiting for authorization")
+
+        # Use ThreadPoolExecutor for timeout control
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(_poll)
+            try:
+                return future.result(timeout=self.config.timeout)
+            except TimeoutError:
+                raise GitHubCopilotAuthError("Authentication timeout exceeded")
+
+    def get_user_info(self, access_token: str) -> Dict:
+        """Get user information from GitHub API."""
+        print("👤 Fetching user information...")
+
+        headers = {
+            "Authorization": f"token {access_token}",
+            "Accept": "application/vnd.github.v3+json",
+        }
+
+        response = self._make_request("GET", self.config.user_api_url, headers=headers)
+        user_info = response.json()
+
+        username = user_info.get("login")
+        if not username:
+            raise GitHubCopilotAuthError("Unable to retrieve username from GitHub API")
+
+        print(f"✅ Successfully authenticated as: {username}")
+        return user_info
+
+    def create_config_files(self, username: str, access_token: str) -> None:
+        """Create hosts.json and apps.json configuration files atomically."""
+        print("📁 Creating configuration files...")
+
+        # Ensure config directory exists
+        try:
+            self.config_dir.mkdir(parents=True, exist_ok=True)
+            print(f"📂 Config directory: {self.config_dir}")
+        except OSError as e:
+            raise GitHubCopilotAuthError(f"Failed to create config directory: {e}")
+
+        # Prepare configurations
+        hosts_config = {"github.com": {"user": username, "oauth_token": access_token}}
+
+        apps_config = {
+            "github.com": {
+                "client_id": self.config.client_id,
+                "editor": "Visual Studio Code",
+                "version": "1.84.0",
+            }
+        }
+
+        # Write files atomically using temporary files
+        for file_path, config, name in [
+            (self.hosts_file, hosts_config, "hosts.json"),
+            (self.apps_file, apps_config, "apps.json"),
+        ]:
+            try:
+                # Write to temporary file first
+                temp_file = file_path.with_suffix(f"{file_path.suffix}.tmp")
+                with open(temp_file, "w") as f:
+                    json.dump(config, f, indent=2)
+
+                # Atomic rename
+                temp_file.rename(file_path)
+                print(f"✅ Created {name}: {file_path}")
+
+            except OSError as e:
+                raise GitHubCopilotAuthError(f"Failed to create {name}: {e}")
+
+    def is_authenticated(self) -> bool:
+        """Check if user is already authenticated."""
+        if not self.hosts_file.exists():
+            return False
+
+        try:
+            with open(self.hosts_file) as f:
+                config = json.load(f)
+
+            token = config.get("github.com", {}).get("oauth_token")
+            if not token:
+                return False
+
+            # Quick token validation
+            headers = {"Authorization": f"token {token}"}
+            response = self.session.get(
+                self.config.user_api_url, headers=headers, timeout=10
+            )
+            return response.status_code == 200
+
+        except (json.JSONDecodeError, OSError, requests.RequestException):
+            return False
+
+    def authenticate(self, force: bool = False) -> bool:
+        """Run the complete authentication process."""
+        try:
+            print("🔐 GitHub Copilot Authentication Script")
+            print("=" * 50)
+            print()
+
+            # Check existing authentication
+            if not force and self.is_authenticated():
+                print("✅ Already authenticated! Use --force to re-authenticate.")
+                return True
+
+            # Step 1: Start device flow
+            device_flow = self.start_device_flow()
+
+            # Step 2: Wait for user input
+            input(
+                "Press Enter after you've completed the authorization in your browser..."
+            )
+            print()
+
+            # Step 3: Poll for access token
+            access_token = self.poll_for_token(
+                device_flow.device_code, device_flow.interval
+            )
+
+            # Step 4: Get user information
+            user_info = self.get_user_info(access_token)
+            username = user_info["login"]
+
+            # Step 5: Create configuration files
+            self.create_config_files(username, access_token)
+
+            self._display_success_summary(username)
+            return True
+
+        except KeyboardInterrupt:
+            print("\n❌ Authentication cancelled by user.")
+        except GitHubCopilotAuthError as e:
+            print(f"\n❌ Authentication failed: {e}")
+        except Exception as e:
+            print(f"\n❌ Unexpected error: {e}")
+
+        return False
+
+    def _display_success_summary(self, username: str) -> None:
+        """Display success summary."""
+        print()
+        print("🎉 Authentication completed successfully!")
+        print("📊 Summary:")
+        print(f"   👤 GitHub user: {username}")
+        print(f"   📂 Config directory: {self.config_dir}")
+        print("   📄 hosts.json: ✅ Created")
+        print("   📄 apps.json: ✅ Created")
+        print()
+        print("🚀 You can now use GitHub Copilot with your authenticated credentials!")
+
+
+def main():
+    """Main entry point."""
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Authenticate with GitHub Copilot using OAuth device flow"
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force re-authentication even if already authenticated",
+    )
+    parser.add_argument(
+        "--config-dir", type=Path, help="Custom configuration directory path"
+    )
+
+    args = parser.parse_args()
+
+    # Run authentication
+    auth = GitHubCopilotAuth(config_dir=args.config_dir)
+    success = auth.authenticate(force=args.force)
+
+    sys.exit(0 if success else 1)
+
+
+if __name__ == "__main__":
+    main()
+# vim: ft=python
