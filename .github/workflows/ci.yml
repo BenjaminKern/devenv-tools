@@ -239,7 +239,7 @@ jobs:
 
           # Clone LLVM separately due to specific branch
           echo "Cloning LLVM"
-          git clone --branch llvmorg-20.1.6 --depth 1 https://github.com/llvm/llvm-project.git llvm-src &
+          git clone --branch llvmorg-20.1.8 --depth 1 https://github.com/llvm/llvm-project.git llvm-src &
 
           wait
 
