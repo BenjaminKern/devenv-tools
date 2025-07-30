@@ -4,6 +4,15 @@ on:
     tags:
       - v*.*.*
   workflow_dispatch:
+  pull_request:
+    branches: [main, master]
+
+env:
+  # Global environment variables
+  GO_LDFLAGS: "-s -w"
+  CARGO_TERM_COLOR: always
+  CMAKE_BUILD_PARALLEL_LEVEL: 4
+
 jobs:
   all:
     if: always()
@@ -13,254 +22,438 @@ jobs:
       - build
       - release
     steps:
-      - run: jq --exit-status 'all(.result == "success")' <<< '${{ toJson(needs) }}'
+      - name: Check all jobs status
+        run: |
+          echo "Build status: ${{ needs.build.result }}"
+          echo "Release status: ${{ needs.release.result }}"
+          jq --exit-status 'all(.result == "success")' <<< '${{ toJson(needs) }}'
+
   release:
     runs-on: ubuntu-latest
-    needs:
-      - build
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Fetch artifacts
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: artifact-*
           merge-multiple: true
-      - name: Release
+
+      - name: List downloaded files
+        run: ls -la *.tar.xz
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/v')
         with:
           files: |
-            *.zip
             *.tar.xz
           draft: false
-          generate_release_notes: false
+          generate_release_notes: true
+          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     strategy:
+      fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-2022
         include:
           - os: ubuntu-latest
             image: ghcr.io/benjaminkern/ci-images/ubuntu/20.04:main
-            btop_build_options: CC=clang CXX=clang++ GPU_SUPPORT=false ADDFLAGS="-stdlib=libc++ -static -lc++abi -pthread -fuse-ld=lld"
-            nvim_build_options: -GNinja -DCMAKE_C_COMPILER=clang
-            nvim_package_name: nvim-linux-x86_64.tar.gz
-            llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON -DLLVM_ENABLE_LLD=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PLUGINS=OFF -DLLVM_STATIC_LINK_CXX_STDLIB=ON
-            suffix: x86_64-linux
+            btop_build_options: "CC=clang CXX=clang++ GPU_SUPPORT=false ADDFLAGS=\"-stdlib=libc++ -static -lc++abi -pthread -fuse-ld=lld\""
+            nvim_build_options: "-GNinja -DCMAKE_C_COMPILER=clang"
+            nvim_package_name: "nvim-linux-x86_64.tar.gz"
+            llvm_build_options: "-DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON -DLLVM_ENABLE_LLD=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PLUGINS=OFF -DLLVM_STATIC_LINK_CXX_STDLIB=ON"
+            suffix: "x86_64-linux"
             extension: ""
+            rust_flags: "-Clink-arg=-fuse-ld=lld"
+            cargo_bin_path: "/usr/local/rust/cargo/bin"
+
           - os: macos-latest
             image: null
             btop_build_options: ""
-            nvim_build_options: -GNinja -DCMAKE_C_COMPILER=clang -DCMAKE_FIND_FRAMEWORK=NEVER -DENABLE_LIBINTL=OFF
-            nvim_package_name: nvim-macos-arm64.tar.gz
-            llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON
-            suffix: aarch64-macos
+            nvim_build_options: "-GNinja -DCMAKE_C_COMPILER=clang -DCMAKE_FIND_FRAMEWORK=NEVER -DENABLE_LIBINTL=OFF"
+            nvim_package_name: "nvim-macos-arm64.tar.gz"
+            llvm_build_options: "-DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON"
+            suffix: "aarch64-macos"
             extension: ""
+            rust_flags: ""
+            cargo_bin_path: "$HOME/.cargo/bin"
+
           - os: windows-2022
             image: null
             btop_build_options: ""
-            nvim_build_options: -GNinja -DCMAKE_C_COMPILER=cl
-            nvim_package_name: nvim-win64.zip
-            llvm_build_options: -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DLLVM_ENABLE_ZLIB=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DLLVM_PARALLEL_LINK_JOBS=1
-            suffix: x86_64-windows
-            extension: .exe
+            nvim_build_options: "-GNinja -DCMAKE_C_COMPILER=cl"
+            nvim_package_name: "nvim-win64.zip"
+            llvm_build_options: "-GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DLLVM_ENABLE_ZLIB=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DLLVM_PARALLEL_LINK_JOBS=1"
+            suffix: "x86_64-windows"
+            extension: ".exe"
+            rust_flags: ""
+            cargo_bin_path: "$HOME/.cargo/bin"
+
     runs-on: ${{ matrix.os }}
     container:
       image: ${{ matrix.image }}
+
+    timeout-minutes: 120
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Prepare tools folder, and fetch all licenses
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment directories
         shell: bash
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb,gontlm-proxy}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}
-          cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
-          curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
-          curl -Ls https://raw.githubusercontent.com/mikefarah/yq/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/yq/LICENSE
-          curl -Ls https://raw.githubusercontent.com/wagoodman/dive/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/dive/LICENSE
-          curl -Ls https://raw.githubusercontent.com/rhysd/actionlint/refs/heads/main/LICENSE.txt -o "$GITHUB_WORKSPACE"/devenv/licenses/actionlint/LICENSE.txt
-          curl -Ls https://raw.githubusercontent.com/FiloSottile/age/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/age/LICENSE
-          curl -Ls https://raw.githubusercontent.com/mvdan/sh/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/shfmt/LICENSE
-          curl -Ls https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/fzf/LICENSE
-          curl -Ls https://raw.githubusercontent.com/bazelbuild/buildtools/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/buildifier/LICENSE
-          curl -Ls https://raw.githubusercontent.com/bazelbuild/buildtools/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/buildozer/LICENSE
-          curl -Ls https://raw.githubusercontent.com/bazelbuild/bazelisk/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/bazelisk/LICENSE
-          curl -Ls https://raw.githubusercontent.com/charmbracelet/vhs/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/vhs/LICENSE
-          curl -Ls https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/COPYING -o "$GITHUB_WORKSPACE"/devenv/licenses/oh-my-posh/COPYING
-          curl -Ls https://raw.githubusercontent.com/aristocratos/btop/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/btop/LICENSE
-          curl -Ls https://raw.githubusercontent.com/neovim/neovim/refs/heads/master/LICENSE.txt -o "$GITHUB_WORKSPACE"/devenv/licenses/neovim/LICENSE.txt
-          curl -Ls https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/LICENSE.TXT -o "$GITHUB_WORKSPACE"/devenv/licenses/llvm/LICENSE.txt
-          curl -Ls https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/lldb/LICENSE.TXT -o "$GITHUB_WORKSPACE"/devenv/licenses/lldb/LICENSE.txt
-          curl -Ls https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/clang-tools-extra/LICENSE.TXT -o "$GITHUB_WORKSPACE"/devenv/licenses/clang-tools-extra/LICENSE.txt
-          curl -Ls https://raw.githubusercontent.com/bootandy/dust/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/dust/LICENSE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/fd/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/fd/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/sharkdp/fd/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/fd/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/BurntSushi/ripgrep/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/rg/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/BurntSushi/ripgrep/refs/heads/master/UNLICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/rg/UNLICENSE
-          curl -Ls https://raw.githubusercontent.com/BurntSushi/ripgrep/refs/heads/master/COPYING -o "$GITHUB_WORKSPACE"/devenv/licenses/rg/COPYING
-          curl -Ls https://raw.githubusercontent.com/astral-sh/uv/refs/heads/main/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/uv/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/astral-sh/uv/refs/heads/main/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/uv/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/astral-sh/ruff/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/ruff/LICENSE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/hyperfine/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/hyperfine/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/hyperfine/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/hyperfine/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/sharkdp/bat/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/bat/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/bat/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/bat/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/chmln/sd/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/sd/LICENSE
-          curl -Ls https://raw.githubusercontent.com/starship/starship/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/starship/LICENSE
-          curl -Ls https://raw.githubusercontent.com/lsd-rs/lsd/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/lsd/LICENSE
-          curl -Ls https://raw.githubusercontent.com/ajeetdsouza/zoxide/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/zoxide/LICENSE
-          curl -Ls https://raw.githubusercontent.com/dandavison/delta/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/delta/LICENSE
-          curl -Ls https://raw.githubusercontent.com/watchexec/watchexec/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/watchexec/LICENSE
-          curl -Ls https://raw.githubusercontent.com/JohnnyMorganz/StyLua/refs/heads/main/LICENSE.md -o "$GITHUB_WORKSPACE"/devenv/licenses/stylua/LICENSE.md
-          curl -Ls https://raw.githubusercontent.com/denoland/deno/refs/heads/main/LICENSE.md -o "$GITHUB_WORKSPACE"/devenv/licenses/deno/LICENSE.md
-          curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/hexyl/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/hexyl/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-MIT
-      - uses: actions/setup-go@v5
-        if: ${{ matrix.os != 'ubuntu-latest' }}
-        with:
-          go-version: stable
-      - name: Prepare go tools configuration
-        run: |
-          echo "GO_LDFLAGS=-s -w" >> "$GITHUB_ENV"
-      - name: Build go tools
-        run: |
-          echo "$GO_LDFLAGS"
-          go install github.com/mikefarah/yq/v4@latest
-          go install github.com/wagoodman/dive@latest
-          go install github.com/rhysd/actionlint/cmd/actionlint@latest
-          go install filippo.io/age/cmd/...@latest
-          go install mvdan.cc/sh/v3/cmd/shfmt@latest
-          go install github.com/junegunn/fzf@latest
-          go install github.com/bazelbuild/buildtools/buildifier@latest
-          go install github.com/bazelbuild/buildtools/buildozer@latest
-          go install github.com/bazelbuild/bazelisk@latest
-          go install github.com/charmbracelet/vhs@latest
-      - name: Add go tools
+
+      - name: Copy shell scripts
         shell: bash
         run: |
-          cp "$HOME"/go/bin/{yq,actionlint,age,age-keygen,bazelisk,buildifier,dive,fzf,shfmt,vhs}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
-          ls "$GITHUB_WORKSPACE"/devenv/bin
-      - name: Download sources (oh-my-posh, btop, neovim, llvm)
+          cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
+
+      - name: Download licenses
+        shell: bash
         run: |
-          git clone --depth 1 https://github.com/JanDeDobbeleer/oh-my-posh.git
-          git clone --depth 1 https://github.com/aristocratos/btop.git btop-src
-          git clone --depth 1 https://github.com/neovim/neovim.git neovim-src
-          git clone --depth 1 https://github.com/bdwyertech/gontlm-proxy.git gontlm-proxy-src
-          git clone --depth 1 https://github.com/Kitware/CMake.git cmake-src
-          git clone --branch llvmorg-20.1.6 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
-      - name: Build oh-my-posh
-        if: ${{ matrix.os != 'windows-2022' }}
+          # Create array of license URLs and destinations
+          declare -A licenses=(
+            ["https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE"]="gontlm-proxy/LICENSE"
+            ["https://raw.githubusercontent.com/mikefarah/yq/refs/heads/master/LICENSE"]="yq/LICENSE"
+            ["https://raw.githubusercontent.com/wagoodman/dive/refs/heads/main/LICENSE"]="dive/LICENSE"
+            ["https://raw.githubusercontent.com/rhysd/actionlint/refs/heads/main/LICENSE.txt"]="actionlint/LICENSE.txt"
+            ["https://raw.githubusercontent.com/FiloSottile/age/refs/heads/main/LICENSE"]="age/LICENSE"
+            ["https://raw.githubusercontent.com/mvdan/sh/refs/heads/master/LICENSE"]="shfmt/LICENSE"
+            ["https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/LICENSE"]="fzf/LICENSE"
+            ["https://raw.githubusercontent.com/bazelbuild/buildtools/refs/heads/main/LICENSE"]="buildifier/LICENSE"
+            ["https://raw.githubusercontent.com/bazelbuild/bazelisk/refs/heads/master/LICENSE"]="bazelisk/LICENSE"
+            ["https://raw.githubusercontent.com/charmbracelet/vhs/refs/heads/main/LICENSE"]="vhs/LICENSE"
+            ["https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/COPYING"]="oh-my-posh/COPYING"
+            ["https://raw.githubusercontent.com/aristocratos/btop/refs/heads/main/LICENSE"]="btop/LICENSE"
+            ["https://raw.githubusercontent.com/neovim/neovim/refs/heads/master/LICENSE.txt"]="neovim/LICENSE.txt"
+            ["https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/LICENSE.TXT"]="llvm/LICENSE.txt"
+            ["https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/lldb/LICENSE.TXT"]="lldb/LICENSE.txt"
+            ["https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/clang-tools-extra/LICENSE.TXT"]="clang-tools-extra/LICENSE.txt"
+            ["https://raw.githubusercontent.com/bootandy/dust/refs/heads/master/LICENSE"]="dust/LICENSE"
+            ["https://raw.githubusercontent.com/sharkdp/fd/refs/heads/master/LICENSE-MIT"]="fd/LICENSE-MIT"
+            ["https://raw.githubusercontent.com/sharkdp/fd/refs/heads/master/LICENSE-APACHE"]="fd/LICENSE-APACHE"
+            ["https://raw.githubusercontent.com/BurntSushi/ripgrep/refs/heads/master/LICENSE-MIT"]="rg/LICENSE-MIT"
+            ["https://raw.githubusercontent.com/BurntSushi/ripgrep/refs/heads/master/UNLICENSE"]="rg/UNLICENSE"
+            ["https://raw.githubusercontent.com/BurntSushi/ripgrep/refs/heads/master/COPYING"]="rg/COPYING"
+            ["https://raw.githubusercontent.com/astral-sh/uv/refs/heads/main/LICENSE-APACHE"]="uv/LICENSE-APACHE"
+            ["https://raw.githubusercontent.com/astral-sh/uv/refs/heads/main/LICENSE-MIT"]="uv/LICENSE-MIT"
+            ["https://raw.githubusercontent.com/astral-sh/ruff/refs/heads/main/LICENSE"]="ruff/LICENSE"
+            ["https://raw.githubusercontent.com/sharkdp/hyperfine/refs/heads/master/LICENSE-APACHE"]="hyperfine/LICENSE-APACHE"
+            ["https://raw.githubusercontent.com/sharkdp/hyperfine/refs/heads/master/LICENSE-MIT"]="hyperfine/LICENSE-MIT"
+            ["https://raw.githubusercontent.com/sharkdp/bat/refs/heads/master/LICENSE-APACHE"]="bat/LICENSE-APACHE"
+            ["https://raw.githubusercontent.com/sharkdp/bat/refs/heads/master/LICENSE-MIT"]="bat/LICENSE-MIT"
+            ["https://raw.githubusercontent.com/chmln/sd/refs/heads/master/LICENSE"]="sd/LICENSE"
+            ["https://raw.githubusercontent.com/starship/starship/refs/heads/master/LICENSE"]="starship/LICENSE"
+            ["https://raw.githubusercontent.com/lsd-rs/lsd/refs/heads/master/LICENSE"]="lsd/LICENSE"
+            ["https://raw.githubusercontent.com/ajeetdsouza/zoxide/refs/heads/main/LICENSE"]="zoxide/LICENSE"
+            ["https://raw.githubusercontent.com/dandavison/delta/refs/heads/main/LICENSE"]="delta/LICENSE"
+            ["https://raw.githubusercontent.com/watchexec/watchexec/refs/heads/main/LICENSE"]="watchexec/LICENSE"
+            ["https://raw.githubusercontent.com/JohnnyMorganz/StyLua/refs/heads/main/LICENSE.md"]="stylua/LICENSE.md"
+            ["https://raw.githubusercontent.com/denoland/deno/refs/heads/main/LICENSE.md"]="deno/LICENSE.md"
+            ["https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-APACHE"]="hexyl/LICENSE-APACHE"
+            ["https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-MIT"]="hexyl/LICENSE-MIT"
+            ["https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-APACHE"]="typos/LICENSE-APACHE"
+            ["https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-MIT"]="typos/LICENSE-MIT"
+          )
+
+          # Download licenses in parallel
+          for url in "${!licenses[@]}"; do
+            dest="${licenses[$url]}"
+            echo "Downloading license: $dest"
+            curl -fsSL "$url" -o "$GITHUB_WORKSPACE/devenv/licenses/$dest" &
+          done
+          wait
+
+      - name: Setup Go
+        if: matrix.os != 'ubuntu-latest'
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+          cache: true
+
+      - name: Build Go tools
+        shell: bash
         run: |
-          echo $GO_LDFLAGS
+          echo "Building Go tools with LDFLAGS: $GO_LDFLAGS"
+
+          # List of Go tools to install
+          go_tools=(
+            "github.com/mikefarah/yq/v4@latest"
+            "github.com/wagoodman/dive@latest"
+            "github.com/rhysd/actionlint/cmd/actionlint@latest"
+            "filippo.io/age/cmd/...@latest"
+            "mvdan.cc/sh/v3/cmd/shfmt@latest"
+            "github.com/junegunn/fzf@latest"
+            "github.com/bazelbuild/buildtools/buildifier@latest"
+            "github.com/bazelbuild/buildtools/buildozer@latest"
+            "github.com/bazelbuild/bazelisk@latest"
+            "github.com/charmbracelet/vhs@latest"
+          )
+
+          # Install tools in parallel where possible
+          for tool in "${go_tools[@]}"; do
+            echo "Installing $tool"
+            go install -ldflags="$GO_LDFLAGS" "$tool"
+          done
+
+      - name: Copy Go tools
+        shell: bash
+        run: |
+          go_bins=(yq actionlint age age-keygen bazelisk buildifier dive fzf shfmt vhs)
+          for bin in "${go_bins[@]}"; do
+            if [[ -f "$HOME/go/bin/$bin${{ matrix.extension }}" ]]; then
+              cp "$HOME/go/bin/$bin${{ matrix.extension }}" "$GITHUB_WORKSPACE/devenv/bin/"
+            else
+              echo "Warning: $bin${{ matrix.extension }} not found"
+            fi
+          done
+          ls -la "$GITHUB_WORKSPACE/devenv/bin/"
+
+      - name: Clone source repositories
+        shell: bash
+        run: |
+          # Clone repositories in parallel
+          repos=(
+            "https://github.com/JanDeDobbeleer/oh-my-posh.git:oh-my-posh"
+            "https://github.com/aristocratos/btop.git:btop-src"
+            "https://github.com/neovim/neovim.git:neovim-src"
+            "https://github.com/bdwyertech/gontlm-proxy.git:gontlm-proxy-src"
+          )
+
+          for repo_info in "${repos[@]}"; do
+            url="${repo_info%:*}"
+            dir="${repo_info#*:}"
+            echo "Cloning $url into $dir"
+            git clone --depth 1 "$url" "$dir" &
+          done
+
+          # Clone LLVM separately due to specific branch
+          echo "Cloning LLVM"
+          git clone --branch llvmorg-20.1.6 --depth 1 https://github.com/llvm/llvm-project.git llvm-src &
+
+          wait
+
+      - name: Build oh-my-posh (Unix)
+        if: matrix.os != 'windows-2022'
+        shell: bash
+        run: |
           cd oh-my-posh/src
-          go build -o $GITHUB_WORKSPACE/devenv/bin/oh-my-posh${{ matrix.extension }}
-      - name: Build oh-my-posh
-        if: ${{ matrix.os == 'windows-2022' }}
+          go build -ldflags="$GO_LDFLAGS" -o "$GITHUB_WORKSPACE/devenv/bin/oh-my-posh${{ matrix.extension }}"
+
+      - name: Build oh-my-posh (Windows)
+        if: matrix.os == 'windows-2022'
+        shell: pwsh
         run: |
-          echo $env:GO_LDFLAGS
           cd oh-my-posh\src
-          go build -o $env:GITHUB_WORKSPACE\devenv\bin\oh-my-posh${{ matrix.extension }}
-      - name: Build gontlm-proxy
-        if: ${{ matrix.os == 'windows-2022' }}
+          go build -ldflags="$env:GO_LDFLAGS" -o "$env:GITHUB_WORKSPACE\devenv\bin\oh-my-posh${{ matrix.extension }}"
+
+      - name: Build gontlm-proxy (Windows only)
+        if: matrix.os == 'windows-2022'
+        shell: pwsh
         run: |
-          echo $env:GO_LDFLAGS
           cd gontlm-proxy-src
-          go build -o $env:GITHUB_WORKSPACE\devenv\bin\gontlm-proxy${{ matrix.extension }}
-      - name: Prepare windows msvc
-        if: ${{ matrix.os == 'windows-2022' }}
+          go build -ldflags="$env:GO_LDFLAGS" -o "$env:GITHUB_WORKSPACE\devenv\bin\gontlm-proxy${{ matrix.extension }}"
+
+      - name: Setup MSVC environment (Windows)
+        if: matrix.os == 'windows-2022'
+        shell: pwsh
         run: |
           .github/scripts/env.ps1
-      - name: Build btop
-        if: ${{ matrix.os != 'windows-2022' }}
-        run: |
-          make -C btop-src ${{ matrix.btop_build_options }}
-          cp btop-src/bin/btop "$GITHUB_WORKSPACE"/devenv/bin
-      - name: Build neovim
-        run: |
-          cmake -S neovim-src/cmake.deps -B neovim-src/.deps -DCMAKE_BUILD_TYPE=Release ${{ matrix.nvim_build_options }}
-          cmake --build neovim-src/.deps
-          cmake -S neovim-src -Bbuild-neovim -DCMAKE_BUILD_TYPE=Release ${{ matrix.nvim_build_options }}
-          cmake --build build-neovim --target package
-      - name: Add neovim tools
-        if: ${{ matrix.os != 'windows-2022' }}
+
+      - name: Build btop (Unix)
+        if: matrix.os != 'windows-2022'
         shell: bash
         run: |
-          tar xfz build-neovim/${{ matrix.nvim_package_name }} --strip=1 -C "$GITHUB_WORKSPACE"/devenv
-      - name: Add neovim tools
-        if: ${{ matrix.os == 'windows-2022' }}
-        run: |
-          Expand-Archive -Path build-neovim\${{ matrix.nvim_package_name }} -DestinationPath $env:GITHUB_WORKSPACE\devenv
-      - name: Clang tools/lldb configure
-        run: |
-          cmake -Bbuild-clangd -S llvm-src/llvm "-DLLVM_ENABLE_PROJECTS=clang;lldb;clang-tools-extra" -GNinja -DCMAKE_BUILD_TYPE=Release -DLLDB_INCLUDE_TESTS=OFF -DLLDB_ENABLE_LIBEDIT=OFF -DLLDB_ENABLE_CURSES=OFF -DLLDB_ENABLE_LIBXML2=OFF -DLLDB_ENABLE_PYTHON=OFF "-DLLVM_TARGETS_TO_BUILD=X86;AArch64;ARM" ${{ matrix.llvm_build_options }}
-      - name: Clang tools/lldb build
-        run: |
-          cmake --build build-clangd --target clang-tidy clangd clang-format clangd-indexer clang-doc lldb lldb-dap lldb-server
-      - name: Add clang tools/lldb
+          cd btop-src
+          make -j$(nproc) ${{ matrix.btop_build_options }}
+          cp bin/btop "$GITHUB_WORKSPACE/devenv/bin/"
+
+      - name: Cache Neovim dependencies
+        uses: actions/cache@v4
+        with:
+          path: neovim-src/.deps
+          key: neovim-deps-${{ matrix.os }}-${{ hashFiles('neovim-src/cmake.deps/**') }}
+          restore-keys: |
+            neovim-deps-${{ matrix.os }}-
+
+      - name: Build Neovim dependencies
         shell: bash
         run: |
-          cp build-clangd/bin/{clang-tidy,clangd,clang-format,clangd-indexer,clang-doc,lldb,lldb-dap,lldb-server}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
-          cp -r build-clangd/lib/clang "$GITHUB_WORKSPACE"/devenv/lib
-      - name: Add neovim tools
+          cmake -S neovim-src/cmake.deps -B neovim-src/.deps \
+            -DCMAKE_BUILD_TYPE=Release \
+            ${{ matrix.nvim_build_options }}
+          cmake --build neovim-src/.deps --parallel
+
+      - name: Build Neovim
         shell: bash
-        if: ${{ matrix.os == 'windows-2022' }}
         run: |
-          cp build-clangd/bin/*.dll "$GITHUB_WORKSPACE"/devenv/bin
-      - name: Add neovim tools
+          cmake -S neovim-src -B build-neovim \
+            -DCMAKE_BUILD_TYPE=Release \
+            ${{ matrix.nvim_build_options }}
+          cmake --build build-neovim --target package --parallel
+
+      - name: Extract Neovim (Unix)
+        if: matrix.os != 'windows-2022'
         shell: bash
-        if: ${{ matrix.os != 'windows-2022' }}
         run: |
-          cp build-clangd/lib/liblldb.* "$GITHUB_WORKSPACE"/devenv/lib
-      - name: Prepare rust tools configuration
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+          tar xfz "build-neovim/${{ matrix.nvim_package_name }}" --strip=1 -C "$GITHUB_WORKSPACE/devenv"
+
+      - name: Extract Neovim (Windows)
+        if: matrix.os == 'windows-2022'
+        shell: pwsh
         run: |
-          echo "RUSTFLAGS=-Clink-arg=-fuse-ld=lld" >> "$GITHUB_ENV"
-      - name: Rust tools
+          Expand-Archive -Path "build-neovim\${{ matrix.nvim_package_name }}" -DestinationPath "$env:GITHUB_WORKSPACE\devenv"
+
+      - name: Cache LLVM build
+        uses: actions/cache@v4
+        with:
+          path: build-clangd
+          key: llvm-${{ matrix.os }}-${{ hashFiles('llvm-src/llvm/**') }}
+          restore-keys: |
+            llvm-${{ matrix.os }}-
+
+      - name: Configure LLVM/Clang tools
+        shell: bash
         run: |
-          echo "$RUSTFLAGS"
-          cargo install --locked du-dust
-          cargo install --locked fd-find
-          cargo install --locked ripgrep
+          cmake -B build-clangd -S llvm-src/llvm \
+            -DLLVM_ENABLE_PROJECTS="clang;lldb;clang-tools-extra" \
+            -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DLLDB_INCLUDE_TESTS=OFF \
+            -DLLDB_ENABLE_LIBEDIT=OFF \
+            -DLLDB_ENABLE_CURSES=OFF \
+            -DLLDB_ENABLE_LIBXML2=OFF \
+            -DLLDB_ENABLE_PYTHON=OFF \
+            -DLLVM_TARGETS_TO_BUILD="X86;AArch64;ARM" \
+            ${{ matrix.llvm_build_options }}
+
+      - name: Build LLVM/Clang tools
+        shell: bash
+        run: |
+          cmake --build build-clangd --parallel \
+            --target clang-tidy clangd clang-format clangd-indexer clang-doc lldb lldb-dap lldb-server
+
+      - name: Copy LLVM/Clang tools
+        shell: bash
+        run: |
+          tools=(clang-tidy clangd clang-format clangd-indexer clang-doc lldb lldb-dap lldb-server)
+          for tool in "${tools[@]}"; do
+            cp "build-clangd/bin/$tool${{ matrix.extension }}" "$GITHUB_WORKSPACE/devenv/bin/"
+          done
+          cp -r build-clangd/lib/clang "$GITHUB_WORKSPACE/devenv/lib/"
+
+      - name: Copy LLVM libraries (Windows)
+        if: matrix.os == 'windows-2022'
+        shell: bash
+        run: |
+          cp build-clangd/bin/*.dll "$GITHUB_WORKSPACE/devenv/bin/"
+
+      - name: Copy LLVM libraries (Unix)
+        if: matrix.os != 'windows-2022'
+        shell: bash
+        run: |
+          cp build-clangd/lib/liblldb.* "$GITHUB_WORKSPACE/devenv/lib/" || true
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Setup Rust environment
+        shell: bash
+        run: |
+          if [[ -n "${{ matrix.rust_flags }}" ]]; then
+            echo "RUSTFLAGS=${{ matrix.rust_flags }}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build Rust tools
+        shell: bash
+        run: |
+          echo "Building Rust tools with RUSTFLAGS: $RUSTFLAGS"
+
+          # Use cargo-binstall for faster installation if available
+          cargo install cargo-binstall || true
+
+          rust_tools=(
+            "du-dust"
+            "fd-find"
+            "ripgrep"
+            "hyperfine"
+            "bat"
+            "sd"
+            "starship"
+            "lsd"
+            "zoxide"
+            "git-delta"
+            "watchexec-cli"
+            "stylua"
+            "deno"
+            "hexyl"
+            "typos-cli"
+          )
+
+          # Try cargo-binstall first, fall back to cargo install
+          for tool in "${rust_tools[@]}"; do
+            echo "Installing $tool"
+            if command -v cargo-binstall >/dev/null 2>&1; then
+              cargo binstall --no-confirm --locked "$tool" || cargo install --locked "$tool"
+            else
+              cargo install --locked "$tool"
+            fi
+          done
+
+          # Install uv and ruff from git
           cargo install --locked --git https://github.com/astral-sh/uv uv
           cargo install --locked --git https://github.com/astral-sh/ruff ruff
-          cargo install --locked hyperfine
-          cargo install --locked bat
-          cargo install --locked sd
-          cargo install --locked starship
-          cargo install --locked lsd
-          cargo install --locked zoxide
-          cargo install --locked git-delta
-          cargo install --locked watchexec-cli
-          cargo install --locked stylua
-          cargo install --locked deno
-          cargo install --locked hexyl
-          cargo install --locked typos-cli
-      - name: Add rust tools (Ubuntu)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+
+      - name: Copy Rust tools
         shell: bash
         run: |
-          cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos} "$GITHUB_WORKSPACE"/devenv/bin
-      - name: Add rust tools
-        if: ${{ matrix.os != 'ubuntu-latest' }}
+          rust_bins=(dust fd rg uv uvx ruff hyperfine bat sd starship lsd zoxide delta watchexec stylua deno hexyl typos)
+
+          cargo_bin_path="${{ matrix.cargo_bin_path }}"
+
+          for bin in "${rust_bins[@]}"; do
+            src_path="$cargo_bin_path/$bin${{ matrix.extension }}"
+            if [[ -f "$src_path" ]]; then
+              cp "$src_path" "$GITHUB_WORKSPACE/devenv/bin/"
+            else
+              echo "Warning: $bin${{ matrix.extension }} not found at $src_path"
+            fi
+          done
+
+      - name: Verify tools
         shell: bash
         run: |
-          cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
-      - name: Package tools
+          echo "Verifying built tools..."
+          ls -la "$GITHUB_WORKSPACE/devenv/bin/"
+
+          # Test a few key tools
+          "$GITHUB_WORKSPACE/devenv/bin/yq${{ matrix.extension }}" --version || echo "yq failed"
+          "$GITHUB_WORKSPACE/devenv/bin/rg${{ matrix.extension }}" --version || echo "rg failed"
+          "$GITHUB_WORKSPACE/devenv/bin/fd${{ matrix.extension }}" --version || echo "fd failed"
+
+      - name: Create package
         shell: bash
         run: |
-          tar cfJ devenv-tools-${{ matrix.suffix }}.tar.xz devenv
-      - name: Upload
+          echo "Creating package devenv-tools-${{ matrix.suffix }}.tar.xz"
+          tar cfJ "devenv-tools-${{ matrix.suffix }}.tar.xz" devenv
+          ls -lh "devenv-tools-${{ matrix.suffix }}.tar.xz"
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact-tools-${{ matrix.suffix }}
           path: devenv-tools-${{ matrix.suffix }}.tar.xz
-          retention-days: 1
+          retention-days: 7
+          compression-level: 0  # Already compressed with xz
