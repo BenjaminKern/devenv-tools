@@ -224,6 +224,8 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           echo "RUSTFLAGS=-Clink-arg=-fuse-ld=lld" >> "$GITHUB_ENV"
+          echo "CC=clang" >> "$GITHUB_ENV"
+          echo "CXX=clang++" >> "$GITHUB_ENV"
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
@@ -241,9 +243,9 @@ jobs:
           cargo install --locked git-delta
           cargo install --locked watchexec-cli
           cargo install --locked stylua
-          cargo install --locked deno
           cargo install --locked hexyl
           cargo install --locked typos-cli
+          cargo install --locked deno
       - name: Add rust tools (Ubuntu)
         if: ${{ matrix.os == 'ubuntu-latest' }}
         shell: bash
