@@ -80,7 +80,7 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb,gontlm-proxy}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
           curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
           curl -Ls https://raw.githubusercontent.com/mikefarah/yq/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/yq/LICENSE
@@ -113,7 +113,6 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/sharkdp/bat/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/bat/LICENSE-APACHE
           curl -Ls https://raw.githubusercontent.com/sharkdp/bat/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/bat/LICENSE-MIT
           curl -Ls https://raw.githubusercontent.com/chmln/sd/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/sd/LICENSE
-          curl -Ls https://raw.githubusercontent.com/starship/starship/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/starship/LICENSE
           curl -Ls https://raw.githubusercontent.com/lsd-rs/lsd/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/lsd/LICENSE
           curl -Ls https://raw.githubusercontent.com/ajeetdsouza/zoxide/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/zoxide/LICENSE
           curl -Ls https://raw.githubusercontent.com/dandavison/delta/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/delta/LICENSE
@@ -237,7 +236,6 @@ jobs:
           cargo install --locked hyperfine
           cargo install --locked bat
           cargo install --locked sd
-          cargo install --locked starship
           cargo install --locked lsd
           cargo install --locked zoxide
           cargo install --locked git-delta
@@ -250,12 +248,12 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         shell: bash
         run: |
-          cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos} "$GITHUB_WORKSPACE"/devenv/bin
+          cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos} "$GITHUB_WORKSPACE"/devenv/bin
       - name: Add rust tools
         if: ${{ matrix.os != 'ubuntu-latest' }}
         shell: bash
         run: |
-          cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,starship,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
       - name: Package tools
         shell: bash
         run: |
