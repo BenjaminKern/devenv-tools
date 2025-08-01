@@ -4,7 +4,6 @@ export EDITOR=nvim
 
 PATH=$devenv_tools_dir/bin:$PATH
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
-export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
 alias ls='lsd'
 alias cat='bat --paging=never'
 
@@ -66,4 +65,4 @@ eval "$(bat --completion bash)"
 eval "$(fzf --bash)"
 # eval "$(fd --gen-completions bash)"
 eval "$(watchexec --completions bash)"
-eval "$(starship init bash)"
+eval "$(oh-my-posh init bash --config $devenv_tools_dir/config/xyz.omp.json)"
