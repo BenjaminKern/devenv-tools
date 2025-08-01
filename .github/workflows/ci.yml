@@ -80,7 +80,7 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb,gontlm-proxy}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,fish-shell}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
           curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
           curl -Ls https://raw.githubusercontent.com/mikefarah/yq/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/yq/LICENSE
@@ -123,6 +123,7 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/hexyl/LICENSE-MIT
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-APACHE
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-MIT
+          curl -Ls https://raw.githubusercontent.com/fish-shell/fish-shell/refs/heads/master/COPYING -o "$GITHUB_WORKSPACE"/devenv/licenses/fish-shell/COPYING
       - uses: actions/setup-go@v5
         if: ${{ matrix.os != 'ubuntu-latest' }}
         with:
@@ -225,6 +226,10 @@ jobs:
           echo "RUSTFLAGS=-Clink-arg=-fuse-ld=lld" >> "$GITHUB_ENV"
           echo "CC=clang" >> "$GITHUB_ENV"
           echo "CXX=clang++" >> "$GITHUB_ENV"
+      - name: Rust unix tools
+        if: ${{ matrix.os != 'windows-2022' }}
+        run: |
+          cargo install --git https://github.com/fish-shell/fish-shell
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
@@ -248,12 +253,16 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         shell: bash
         run: |
+          ls /usr/local/rust/cargo/bin/
           cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos} "$GITHUB_WORKSPACE"/devenv/bin
+          cp /usr/local/rust/cargo/bin/fish* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Add rust tools
         if: ${{ matrix.os != 'ubuntu-latest' }}
         shell: bash
         run: |
+          ls "$HOME"/.cargo/bin
           cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp "$HOME"/.cargo/bin/fish* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Package tools
         shell: bash
         run: |
