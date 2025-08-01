@@ -10,13 +10,13 @@ fi
 echo "Downloading tools..."
 if [[ "$(uname)" == "Darwin" ]]; then
   DESTDIR="$(realpath "$1")"
-  curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/v0.0.5/devenv-tools-aarch64-macos.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
-  curl -sL https://github.com/lima-vm/lima/releases/download/v1.1.1/lima-1.1.1-Darwin-arm64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
+  curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/v0.0.7/devenv-tools-aarch64-macos.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
+  curl -sL https://github.com/lima-vm/lima/releases/download/v1.2.1/lima-1.2.1-Darwin-arm64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
   curl -sL https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.darwin.aarch64.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"/bin
 else
   DESTDIR="$(readlink -e "$1")"
-  curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/v0.0.5/devenv-tools-x86_64-linux.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
-  curl -sL https://github.com/lima-vm/lima/releases/download/v1.1.1/lima-1.1.1-Linux-x86_64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
+  curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/v0.0.7/devenv-tools-x86_64-linux.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
+  curl -sL https://github.com/lima-vm/lima/releases/download/v1.2.1/lima-1.2.1-Linux-x86_64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
   curl -sL https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"/bin
   curl -Ls https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 -o "$DESTDIR"/bin/hadolint
   chmod u+x "$DESTDIR"/bin/hadolint
