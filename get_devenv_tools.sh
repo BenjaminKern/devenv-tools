@@ -43,6 +43,7 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/devenv
 
 echo "Downloading github copilot auth tool..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/github_copilot_auth -o "$DESTDIR"/bin/github_copilot_auth
+chmod u+x "$DESTDIR"/bin/github_copilot_auth
 
 echo "Downloading zsh-autosuggestions..."
 curl -Ls https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz | tar xfz - --strip-components=1 -C "$DESTDIR"/zsh-autosuggestions
