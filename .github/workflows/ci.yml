@@ -195,6 +195,7 @@ jobs:
           git clone --depth 1 https://github.com/bdwyertech/gontlm-proxy.git gontlm-proxy-src
           git clone --depth 1 https://github.com/Kitware/CMake.git cmake-src
           git clone --branch llvmorg-20.1.8 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
+          git clone --depth 1 https://github.com/fish-shell/fish-shell.git fish-shell-src
       - name: Build oh-my-posh
         if: ${{ matrix.os != 'windows-2022' }}
         run: |
@@ -265,9 +266,14 @@ jobs:
           echo "CC=clang" >> "$GITHUB_ENV"
           echo "CXX=clang++" >> "$GITHUB_ENV"
       - name: Rust unix tools
+        shell: bash
         if: ${{ matrix.os != 'windows-2022' }}
         run: |
-          cargo install --git https://github.com/fish-shell/fish-shell
+          cd fish-shell-src
+          PCRE2_SYS_STATIC=1 cargo build --release --bin fish
+          ls target
+          cp target/*/release/fish* "$GITHUB_WORKSPACE"/devenv/bin
+          ls "$GITHUB_WORKSPACE"/devenv/bin
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
@@ -300,7 +306,6 @@ jobs:
         run: |
           ls "$HOME"/.cargo/bin
           cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
-          cp "$HOME"/.cargo/bin/fish* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Package tools
         shell: bash
         run: |
