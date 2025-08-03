@@ -61,8 +61,8 @@ alias find_and_replace='fd --type f -x sd'
 alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
 
 eval "$(zoxide init --cmd j bash)"
-eval "$(bat --completion bash)"
+# eval "$(bat --completion bash)"
 eval "$(fzf --bash)"
-# eval "$(fd --gen-completions bash)"
+eval "$(fd --gen-completions bash)"
 eval "$(watchexec --completions bash)"
 eval "$(oh-my-posh init bash --config $devenv_tools_dir/config/xyz.omp.json)"
