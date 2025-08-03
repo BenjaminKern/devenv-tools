@@ -272,7 +272,7 @@ jobs:
           cd fish-shell-src
           PCRE2_SYS_STATIC=1 cargo build --release --bin fish
           ls target
-          cp target/*/release/fish* "$GITHUB_WORKSPACE"/devenv/bin
+          cp target/release/fish* "$GITHUB_WORKSPACE"/devenv/bin
           ls "$GITHUB_WORKSPACE"/devenv/bin
       - name: Rust tools
         run: |
