@@ -29,6 +29,7 @@ if [[ -f "$devenv_tools_dir/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; the
 fi
 
 PATH="$devenv_tools_dir/bin:$PATH"
+[[ -d "$devenv_tools_dir/llama.cpp/bin" ]] && PATH="$devenv_tools_dir/llama.cpp/bin:$PATH"
 export PATH
 
 alias ls='lsd'
