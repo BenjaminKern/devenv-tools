@@ -20,7 +20,7 @@ where tar >nul 2>&1 || (
 if not exist "%DESTDIR%" mkdir "%DESTDIR%"
 
 echo Downloading devenv tools...
-curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/v0.0.8/devenv-tools-x86_64-windows.tar.xz -o "%TEMP%\devenv-tools-x86_64-windows.tar.xz"
+curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-x86_64-windows.tar.xz -o "%TEMP%\devenv-tools-x86_64-windows.tar.xz"
 tar xf "%TEMP%\devenv-tools-x86_64-windows.tar.xz" --strip=1 -C "%DESTDIR%"
 del "%TEMP%\devenv-tools-x86_64-windows.tar.xz"
 
