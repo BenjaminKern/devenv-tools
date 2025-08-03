@@ -32,28 +32,28 @@ jobs:
         with:
           pattern: artifact-*
           merge-multiple: true
-      - name: Create or update latest tag
+      - name: Delete existing latest release
+        continue-on-error: true
+        run: |
+          # Delete the existing release first (GitHub CLI will handle if it doesn't exist)
+          gh release delete latest --yes || echo "No existing latest release to delete"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update latest tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Delete existing latest tag and release if it exists
+          # Delete existing latest tag if it exists
           if git tag -l "latest" | grep -q "latest"; then
             echo "Deleting existing latest tag..."
             git tag -d latest
             git push origin :refs/tags/latest || true
           fi
 
-          # Create new latest tag
+          # Create new latest tag pointing to current commit
           git tag latest
           git push origin latest
-      - name: Delete existing latest release
-        continue-on-error: true
-        run: |
-          # Delete the existing release (GitHub CLI will handle if it doesn't exist)
-          gh release delete latest --yes || echo "No existing latest release to delete"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create latest release
         uses: softprops/action-gh-release@v2
         with:
