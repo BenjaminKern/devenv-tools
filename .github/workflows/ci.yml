@@ -100,8 +100,8 @@ jobs:
 
           download_license() {
             local repo="$1" file="$2" dest="$3"
-            curl -fsSL "https://raw.githubusercontent.com/$repo/refs/heads/main/$file" -o "$GITHUB_WORKSPACE/devenv/licenses/$dest" || \
-            curl -fsSL "https://raw.githubusercontent.com/$repo/refs/heads/master/$file" -o "$GITHUB_WORKSPACE/devenv/licenses/$dest"
+            curl -fsSL "https://raw.githubusercontent.com/$repo/main/$file" -o "$GITHUB_WORKSPACE/devenv/licenses/$dest" || \
+            curl -fsSL "https://raw.githubusercontent.com/$repo/master/$file" -o "$GITHUB_WORKSPACE/devenv/licenses/$dest"
           }
 
           download_license "bdwyertech/gontlm-proxy" "LICENSE" "gontlm-proxy/LICENSE"
