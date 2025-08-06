@@ -19,61 +19,38 @@ jobs:
       - run: jq --exit-status 'all(.result == "success")' <<< '${{ toJson(needs) }}'
   release:
     runs-on: ubuntu-latest
-    needs:
-      - build
+    needs: build
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Need full history to work with tags
-      - name: Fetch artifacts
-        uses: actions/download-artifact@v4
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
         with:
           pattern: artifact-*
           merge-multiple: true
-      - name: Delete existing latest release
-        continue-on-error: true
-        run: |
-          # Delete the existing release first (GitHub CLI will handle if it doesn't exist)
-          gh release delete latest --yes || echo "No existing latest release to delete"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update latest tag
+      - name: Update release
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Delete existing latest tag if it exists
-          if git tag -l "latest" | grep -q "latest"; then
-            echo "Deleting existing latest tag..."
-            git tag -d latest
-            git push origin :refs/tags/latest || true
-          fi
+          gh release delete latest --yes || true
+          git tag -d latest 2>/dev/null || true
+          git push origin :refs/tags/latest 2>/dev/null || true
 
-          # Create new latest tag pointing to current commit
           git tag latest
           git push origin latest
-      - name: Create latest release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: latest
-          name: Latest Development Build
-          body: |
-            This is the latest development build, automatically generated from the main branch.
 
-            **Build Information:**
-            - Commit: ${{ github.sha }}
-            - Branch: ${{ github.ref_name }}
-            - Workflow Run: ${{ github.run_number }}
-            - Triggered by: @${{ github.actor }}
-          files: |
-            *.zip
-            *.tar.xz
-          draft: false
-          prerelease: false
-          generate_release_notes: false
-          make_latest: true
+          gh release create latest *.tar.xz *.zip \
+            --title "Latest Development Build" \
+            --notes "This is the latest development build, automatically generated from the main branch.
+
+          **Build Information:**
+          - Commit: ${{ github.sha }}
+          - Branch: ${{ github.ref_name }}
+          - Workflow Run: ${{ github.run_number }}
+          - Triggered by: @${{ github.actor }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   build:
@@ -113,65 +90,68 @@ jobs:
       image: ${{ matrix.image }}
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare tools folder, and fetch all licenses
+      - name: Setup directories and download licenses
         shell: bash
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb,gontlm-proxy}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,fish-shell}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb,gontlm-proxy,clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,fish-shell}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
-          curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
-          curl -Ls https://raw.githubusercontent.com/mikefarah/yq/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/yq/LICENSE
-          curl -Ls https://raw.githubusercontent.com/wagoodman/dive/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/dive/LICENSE
-          curl -Ls https://raw.githubusercontent.com/rhysd/actionlint/refs/heads/main/LICENSE.txt -o "$GITHUB_WORKSPACE"/devenv/licenses/actionlint/LICENSE.txt
-          curl -Ls https://raw.githubusercontent.com/FiloSottile/age/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/age/LICENSE
-          curl -Ls https://raw.githubusercontent.com/mvdan/sh/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/shfmt/LICENSE
-          curl -Ls https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/fzf/LICENSE
-          curl -Ls https://raw.githubusercontent.com/bazelbuild/buildtools/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/buildifier/LICENSE
-          curl -Ls https://raw.githubusercontent.com/bazelbuild/buildtools/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/buildozer/LICENSE
-          curl -Ls https://raw.githubusercontent.com/bazelbuild/bazelisk/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/bazelisk/LICENSE
-          curl -Ls https://raw.githubusercontent.com/charmbracelet/vhs/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/vhs/LICENSE
-          curl -Ls https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/COPYING -o "$GITHUB_WORKSPACE"/devenv/licenses/oh-my-posh/COPYING
-          curl -Ls https://raw.githubusercontent.com/aristocratos/btop/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/btop/LICENSE
-          curl -Ls https://raw.githubusercontent.com/neovim/neovim/refs/heads/master/LICENSE.txt -o "$GITHUB_WORKSPACE"/devenv/licenses/neovim/LICENSE.txt
-          curl -Ls https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/LICENSE.TXT -o "$GITHUB_WORKSPACE"/devenv/licenses/llvm/LICENSE.txt
-          curl -Ls https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/lldb/LICENSE.TXT -o "$GITHUB_WORKSPACE"/devenv/licenses/lldb/LICENSE.txt
-          curl -Ls https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/clang-tools-extra/LICENSE.TXT -o "$GITHUB_WORKSPACE"/devenv/licenses/clang-tools-extra/LICENSE.txt
-          curl -Ls https://raw.githubusercontent.com/bootandy/dust/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/dust/LICENSE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/fd/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/fd/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/sharkdp/fd/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/fd/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/BurntSushi/ripgrep/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/rg/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/BurntSushi/ripgrep/refs/heads/master/UNLICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/rg/UNLICENSE
-          curl -Ls https://raw.githubusercontent.com/BurntSushi/ripgrep/refs/heads/master/COPYING -o "$GITHUB_WORKSPACE"/devenv/licenses/rg/COPYING
-          curl -Ls https://raw.githubusercontent.com/astral-sh/uv/refs/heads/main/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/uv/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/astral-sh/uv/refs/heads/main/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/uv/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/astral-sh/ruff/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/ruff/LICENSE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/hyperfine/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/hyperfine/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/hyperfine/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/hyperfine/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/sharkdp/bat/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/bat/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/bat/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/bat/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/chmln/sd/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/sd/LICENSE
-          curl -Ls https://raw.githubusercontent.com/lsd-rs/lsd/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/lsd/LICENSE
-          curl -Ls https://raw.githubusercontent.com/ajeetdsouza/zoxide/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/zoxide/LICENSE
-          curl -Ls https://raw.githubusercontent.com/dandavison/delta/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/delta/LICENSE
-          curl -Ls https://raw.githubusercontent.com/watchexec/watchexec/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/watchexec/LICENSE
-          curl -Ls https://raw.githubusercontent.com/JohnnyMorganz/StyLua/refs/heads/main/LICENSE.md -o "$GITHUB_WORKSPACE"/devenv/licenses/stylua/LICENSE.md
-          curl -Ls https://raw.githubusercontent.com/denoland/deno/refs/heads/main/LICENSE.md -o "$GITHUB_WORKSPACE"/devenv/licenses/deno/LICENSE.md
-          curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/hexyl/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/hexyl/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-APACHE
-          curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/fish-shell/fish-shell/refs/heads/master/COPYING -o "$GITHUB_WORKSPACE"/devenv/licenses/fish-shell/COPYING
+
+          download_license() {
+            local repo="$1" file="$2" dest="$3"
+            curl -fsSL "https://raw.githubusercontent.com/$repo/refs/heads/main/$file" -o "$GITHUB_WORKSPACE/devenv/licenses/$dest" || \
+            curl -fsSL "https://raw.githubusercontent.com/$repo/refs/heads/master/$file" -o "$GITHUB_WORKSPACE/devenv/licenses/$dest"
+          }
+
+          download_license "bdwyertech/gontlm-proxy" "LICENSE" "gontlm-proxy/LICENSE"
+          download_license "mikefarah/yq" "LICENSE" "yq/LICENSE"
+          download_license "wagoodman/dive" "LICENSE" "dive/LICENSE"
+          download_license "rhysd/actionlint" "LICENSE.txt" "actionlint/LICENSE.txt"
+          download_license "FiloSottile/age" "LICENSE" "age/LICENSE"
+          download_license "mvdan/sh" "LICENSE" "shfmt/LICENSE"
+          download_license "junegunn/fzf" "LICENSE" "fzf/LICENSE"
+          download_license "bazelbuild/buildtools" "LICENSE" "buildifier/LICENSE"
+          download_license "bazelbuild/buildtools" "LICENSE" "buildozer/LICENSE"
+          download_license "bazelbuild/bazelisk" "LICENSE" "bazelisk/LICENSE"
+          download_license "charmbracelet/vhs" "LICENSE" "vhs/LICENSE"
+          download_license "JanDeDobbeleer/oh-my-posh" "COPYING" "oh-my-posh/COPYING"
+          download_license "aristocratos/btop" "LICENSE" "btop/LICENSE"
+          download_license "neovim/neovim" "LICENSE.txt" "neovim/LICENSE.txt"
+          download_license "llvm/llvm-project" "LICENSE.TXT" "llvm/LICENSE.txt"
+          download_license "llvm/llvm-project" "lldb/LICENSE.TXT" "lldb/LICENSE.txt"
+          download_license "llvm/llvm-project" "clang-tools-extra/LICENSE.TXT" "clang-tools-extra/LICENSE.txt"
+          download_license "bootandy/dust" "LICENSE" "dust/LICENSE"
+          download_license "sharkdp/fd" "LICENSE-MIT" "fd/LICENSE-MIT"
+          download_license "sharkdp/fd" "LICENSE-APACHE" "fd/LICENSE-APACHE"
+          download_license "BurntSushi/ripgrep" "LICENSE-MIT" "rg/LICENSE-MIT"
+          download_license "BurntSushi/ripgrep" "UNLICENSE" "rg/UNLICENSE"
+          download_license "BurntSushi/ripgrep" "COPYING" "rg/COPYING"
+          download_license "astral-sh/uv" "LICENSE-APACHE" "uv/LICENSE-APACHE"
+          download_license "astral-sh/uv" "LICENSE-MIT" "uv/LICENSE-MIT"
+          download_license "astral-sh/ruff" "LICENSE" "ruff/LICENSE"
+          download_license "sharkdp/hyperfine" "LICENSE-APACHE" "hyperfine/LICENSE-APACHE"
+          download_license "sharkdp/hyperfine" "LICENSE-MIT" "hyperfine/LICENSE-MIT"
+          download_license "sharkdp/bat" "LICENSE-APACHE" "bat/LICENSE-APACHE"
+          download_license "sharkdp/bat" "LICENSE-MIT" "bat/LICENSE-MIT"
+          download_license "chmln/sd" "LICENSE" "sd/LICENSE"
+          download_license "lsd-rs/lsd" "LICENSE" "lsd/LICENSE"
+          download_license "ajeetdsouza/zoxide" "LICENSE" "zoxide/LICENSE"
+          download_license "dandavison/delta" "LICENSE" "delta/LICENSE"
+          download_license "watchexec/watchexec" "LICENSE" "watchexec/LICENSE"
+          download_license "JohnnyMorganz/StyLua" "LICENSE.md" "stylua/LICENSE.md"
+          download_license "denoland/deno" "LICENSE.md" "deno/LICENSE.md"
+          download_license "sharkdp/hexyl" "LICENSE-APACHE" "hexyl/LICENSE-APACHE"
+          download_license "sharkdp/hexyl" "LICENSE-MIT" "hexyl/LICENSE-MIT"
+          download_license "crate-ci/typos" "LICENSE-APACHE" "typos/LICENSE-APACHE"
+          download_license "crate-ci/typos" "LICENSE-MIT" "typos/LICENSE-MIT"
+          download_license "fish-shell/fish-shell" "COPYING" "fish-shell/COPYING"
       - uses: actions/setup-go@v5
         if: ${{ matrix.os != 'ubuntu-latest' }}
         with:
           go-version: stable
-      - name: Prepare go tools configuration
+      - name: Build and install Go tools
         run: |
-          echo "GO_LDFLAGS=-s -w" >> "$GITHUB_ENV"
-      - name: Build go tools
-        run: |
-          echo "$GO_LDFLAGS"
+          export GO_LDFLAGS="-s -w"
           go install github.com/mikefarah/yq/v4@latest
           go install github.com/wagoodman/dive@latest
           go install github.com/rhysd/actionlint/cmd/actionlint@latest
@@ -182,11 +162,10 @@ jobs:
           go install github.com/bazelbuild/buildtools/buildozer@latest
           go install github.com/bazelbuild/bazelisk@latest
           go install github.com/charmbracelet/vhs@latest
-      - name: Add go tools
+      - name: Copy Go tools
         shell: bash
         run: |
           cp "$HOME"/go/bin/{yq,actionlint,age,age-keygen,bazelisk,buildifier,dive,fzf,shfmt,vhs}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
-          ls "$GITHUB_WORKSPACE"/devenv/bin
       - name: Download sources (oh-my-posh, btop, neovim, llvm)
         run: |
           git clone --depth 1 https://github.com/JanDeDobbeleer/oh-my-posh.git
@@ -197,17 +176,10 @@ jobs:
           git clone --branch llvmorg-20.1.8 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
           git clone --depth 1 https://github.com/fish-shell/fish-shell.git fish-shell-src
       - name: Build oh-my-posh
-        if: ${{ matrix.os != 'windows-2022' }}
+        shell: bash
         run: |
-          echo $GO_LDFLAGS
           cd oh-my-posh/src
-          go build -o $GITHUB_WORKSPACE/devenv/bin/oh-my-posh${{ matrix.extension }}
-      - name: Build oh-my-posh
-        if: ${{ matrix.os == 'windows-2022' }}
-        run: |
-          echo $env:GO_LDFLAGS
-          cd oh-my-posh\src
-          go build -o $env:GITHUB_WORKSPACE\devenv\bin\oh-my-posh${{ matrix.extension }}
+          go build -o "$GITHUB_WORKSPACE/devenv/bin/oh-my-posh${{ matrix.extension }}"
       - name: Build gontlm-proxy
         if: ${{ matrix.os == 'windows-2022' }}
         run: |
@@ -229,15 +201,14 @@ jobs:
           cmake --build neovim-src/.deps
           cmake -S neovim-src -Bbuild-neovim -DCMAKE_BUILD_TYPE=Release ${{ matrix.nvim_build_options }}
           cmake --build build-neovim --target package
-      - name: Add neovim tools
-        if: ${{ matrix.os != 'windows-2022' }}
+      - name: Extract neovim
         shell: bash
         run: |
-          tar xfz build-neovim/${{ matrix.nvim_package_name }} --strip=1 -C "$GITHUB_WORKSPACE"/devenv
-      - name: Add neovim tools
-        if: ${{ matrix.os == 'windows-2022' }}
-        run: |
-          Expand-Archive -Path build-neovim\${{ matrix.nvim_package_name }} -DestinationPath $env:GITHUB_WORKSPACE\devenv
+          if [[ "${{ matrix.os }}" == "windows-2022" ]]; then
+            powershell -Command "Expand-Archive -Path 'build-neovim/${{ matrix.nvim_package_name }}' -DestinationPath '$env:GITHUB_WORKSPACE/devenv'"
+          else
+            tar xfz build-neovim/${{ matrix.nvim_package_name }} --strip=1 -C "$GITHUB_WORKSPACE"/devenv
+          fi
       - name: Clang tools/lldb configure
         run: |
           cmake -Bbuild-clangd -S llvm-src/llvm "-DLLVM_ENABLE_PROJECTS=clang;lldb;clang-tools-extra" -GNinja -DCMAKE_BUILD_TYPE=Release -DLLDB_INCLUDE_TESTS=OFF -DLLDB_ENABLE_LIBEDIT=OFF -DLLDB_ENABLE_CURSES=OFF -DLLDB_ENABLE_LIBXML2=OFF -DLLDB_ENABLE_PYTHON=OFF "-DLLVM_TARGETS_TO_BUILD=X86;AArch64;ARM" ${{ matrix.llvm_build_options }}
@@ -249,16 +220,14 @@ jobs:
         run: |
           cp build-clangd/bin/{clang-tidy,clangd,clang-format,clangd-indexer,clang-doc,lldb,lldb-dap,lldb-server}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
           cp -r build-clangd/lib/clang "$GITHUB_WORKSPACE"/devenv/lib
-      - name: Add neovim tools
+      - name: Copy LLDB libraries
         shell: bash
-        if: ${{ matrix.os == 'windows-2022' }}
         run: |
-          cp build-clangd/bin/*.dll "$GITHUB_WORKSPACE"/devenv/bin
-      - name: Add neovim tools
-        shell: bash
-        if: ${{ matrix.os != 'windows-2022' }}
-        run: |
-          cp build-clangd/lib/liblldb.* "$GITHUB_WORKSPACE"/devenv/lib
+          if [[ "${{ matrix.os }}" == "windows-2022" ]]; then
+            cp build-clangd/bin/*.dll "$GITHUB_WORKSPACE"/devenv/bin
+          else
+            cp build-clangd/lib/liblldb.* "$GITHUB_WORKSPACE"/devenv/lib
+          fi
       - name: Prepare rust tools configuration
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
@@ -293,19 +262,15 @@ jobs:
           cargo install --locked hexyl
           cargo install --locked typos-cli
           cargo install --locked deno
-      - name: Add rust tools (Ubuntu)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+      - name: Copy Rust tools
         shell: bash
         run: |
-          ls /usr/local/rust/cargo/bin/
-          cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos} "$GITHUB_WORKSPACE"/devenv/bin
-          cp /usr/local/rust/cargo/bin/fish* "$GITHUB_WORKSPACE"/devenv/bin || true
-      - name: Add rust tools
-        if: ${{ matrix.os != 'ubuntu-latest' }}
-        shell: bash
-        run: |
-          ls "$HOME"/.cargo/bin
-          cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos} "$GITHUB_WORKSPACE"/devenv/bin
+            cp /usr/local/rust/cargo/bin/fish* "$GITHUB_WORKSPACE"/devenv/bin 2>/dev/null || true
+          else
+            cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          fi
       - name: Package tools
         shell: bash
         run: |
@@ -316,4 +281,3 @@ jobs:
           name: artifact-tools-${{ matrix.suffix }}
           path: devenv-tools-${{ matrix.suffix }}.tar.xz
           retention-days: 1
-
