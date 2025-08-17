@@ -1,6 +1,7 @@
 devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 ! [[ -f $devenv_tools_dir/devenv_tools.bash ]] && return
 export EDITOR=nvim
+export SHELL=/bin/bash
 
 PATH=$devenv_tools_dir/bin:$PATH
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
