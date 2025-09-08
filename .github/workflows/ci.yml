@@ -162,7 +162,7 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-APACHE
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-MIT
           curl -Ls https://raw.githubusercontent.com/fish-shell/fish-shell/refs/heads/master/COPYING -o "$GITHUB_WORKSPACE"/devenv/licenses/fish-shell/COPYING
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         if: ${{ matrix.os != 'ubuntu-latest' }}
         with:
           go-version: stable
