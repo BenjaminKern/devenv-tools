@@ -284,6 +284,10 @@ jobs:
           cargo install --locked stylua
           cargo install --locked hexyl
           cargo install --locked typos-cli
+      - name: Rust tools (non-windows)
+        shell: bash
+        if: ${{ matrix.os != 'windows-2022' }}
+        run: |
           cargo install --locked deno
       - name: Add rust tools (Ubuntu)
         if: ${{ matrix.os == 'ubuntu-latest' }}
@@ -297,7 +301,8 @@ jobs:
         shell: bash
         run: |
           ls "$HOME"/.cargo/bin
-          cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,btm}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,hexyl,typos,btm}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp "$HOME"/.cargo/bin/deno* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Package tools
         shell: bash
         run: |
