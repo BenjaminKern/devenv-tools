@@ -8,21 +8,18 @@ if [[ -z "${1:-}" ]]; then
 fi
 
 echo "Downloading tools..."
-LIMA_VERSION=$(curl -s https://api.github.com/repos/lima-vm/lima/releases/latest | jq -r .tag_name)
 LLAMA_VERSION=$(curl -s https://api.github.com/repos/ggml-org/llama.cpp/releases/latest | jq -r .tag_name)
 
 if [[ "$(uname)" == "Darwin" ]]; then
   DESTDIR="$(realpath "$1")"
   mkdir -p "$DESTDIR"/llama.cpp
   curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-aarch64-macos.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
-  curl -sL https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-Darwin-arm64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
   curl -sL https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.darwin.aarch64.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"/bin
   curl -Ls https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-${LLAMA_VERSION}-bin-macos-arm64.zip | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
   chmod u+x "$DESTDIR"/llama.cpp/bin/llama-*
 else
   DESTDIR="$(readlink -e "$1")"
   curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-x86_64-linux.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
-  curl -sL https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-Linux-x86_64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
   curl -sL https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"/bin
   curl -Ls https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 -o "$DESTDIR"/bin/hadolint
   chmod u+x "$DESTDIR"/bin/hadolint
