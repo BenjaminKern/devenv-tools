@@ -308,7 +308,7 @@ jobs:
         run: |
           tar cfJ devenv-tools-${{ matrix.suffix }}.tar.xz devenv
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: artifact-tools-${{ matrix.suffix }}
           path: devenv-tools-${{ matrix.suffix }}.tar.xz
