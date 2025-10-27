@@ -16,6 +16,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
   curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-aarch64-macos.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
   curl -sL https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.darwin.aarch64.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"/bin
   curl -Ls https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-${LLAMA_VERSION}-bin-macos-arm64.zip | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
+  curl -Ls https://github.com/neovim/neovim/releases/download/nightly/nvim-macos-arm64.tar.gz | tar xfz - -C "$DESTDIR"
   chmod u+x "$DESTDIR"/llama.cpp/bin/llama-*
 else
   DESTDIR="$(readlink -e "$1")"

@@ -3,7 +3,13 @@ devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export EDITOR=nvim
 export SHELL=/bin/bash
 
-PATH=$devenv_tools_dir/bin:$PATH
+if [[ -d "$devenv_tools_dir/git/libexec/git-core" ]]; then
+  export GIT_EXEC_PATH="$devenv_tools_dir/git/libexec/git-core"
+  export GIT_TEMPLATE_DIR="$devenv_tools_dir/git/share/git-core/templates"
+  PATH="$devenv_tools_dir/bin:$devenv_tools_dir/git/bin:$PATH"
+else
+  PATH="$devenv_tools_dir/bin:$PATH"
+fi
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 alias ls='lsd'
 alias cat='bat --paging=never'
