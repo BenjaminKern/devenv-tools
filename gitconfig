@@ -11,3 +11,4 @@
     unstage = reset HEAD --
     wipe = !git reset --hard HEAD && git clean -fd
     diffc = diff --cached
+    ri = "!f() { git rebase -i HEAD~$1; }; f"
