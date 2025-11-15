@@ -1,0 +1,4 @@
+[alias]
+    cd = commit
+    amend = commit --amend --no-edit
+    bump = !git commit -m \"$(date +'%Y-%m-%d %H:%M:%S')\"

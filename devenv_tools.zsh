@@ -32,6 +32,8 @@ PATH="$devenv_tools_dir/bin:$PATH"
 [[ -d "$devenv_tools_dir/llama.cpp/bin" ]] && PATH="$devenv_tools_dir/llama.cpp/bin:$PATH"
 export PATH
 
+git config --global include.path "$devenv_tools_dir"/gitconfig
+
 alias ls='lsd'
 alias cat='bat --paging=never'
 alias which='whence -p'

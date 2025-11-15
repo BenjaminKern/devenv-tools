@@ -47,6 +47,9 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/devenv
 echo "Downloading devenv_tools.zsh..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/devenv_tools.zsh -o "$DESTDIR"/devenv_tools.zsh
 
+echo "Downloading gitconfig..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/gitconfig -o "$DESTDIR"/gitconfig
+
 echo "Downloading github copilot auth tool..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/github_copilot_auth -o "$DESTDIR"/bin/github_copilot_auth
 chmod u+x "$DESTDIR"/bin/github_copilot_auth

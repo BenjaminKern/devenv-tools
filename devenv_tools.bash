@@ -10,6 +10,9 @@ if [[ -d "$devenv_tools_dir/git/libexec/git-core" ]]; then
 else
   PATH="$devenv_tools_dir/bin:$PATH"
 fi
+
+git config --global include.path "$devenv_tools_dir"/gitconfig
+
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 alias ls='lsd'
 alias cat='bat --paging=never'
