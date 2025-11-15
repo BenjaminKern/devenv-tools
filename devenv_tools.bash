@@ -67,6 +67,10 @@ alias for_all_files='fd --type f -x'
 alias find_and_replace='fd --type f -x sd'
 alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
 
+alias gds='git diff --cached | nvim -'
+alias gdm='git diff origin/main | nvim -'
+
+
 eval "$(zoxide init --cmd j bash)"
 # eval "$(bat --completion bash)"
 eval "$(fzf --bash)"
