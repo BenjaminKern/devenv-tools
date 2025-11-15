@@ -72,6 +72,10 @@ alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
 
 alias gds='git diff --cached | nvim -'
 alias gdm='git diff origin/main | nvim -'
+alias b='bazel'
+alias bb='bazel build'
+alias bt='bazel test'
+alias br='bazel run'
 
 
 eval "$(zoxide init --cmd j bash)"
