@@ -28,7 +28,7 @@ jobs:
         with:
           fetch-depth: 0 # Need full history to work with tags
       - name: Fetch artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: artifact-*
           merge-multiple: true
@@ -86,7 +86,6 @@ jobs:
         include:
           - os: ubuntu-latest
             image: ghcr.io/benjaminkern/ci-images/ubuntu/20.04:main
-            btop_build_options: CC=clang CXX=clang++ GPU_SUPPORT=false ADDFLAGS="-stdlib=libc++ -static -lc++abi -pthread -fuse-ld=lld"
             nvim_build_options: -GNinja -DCMAKE_C_COMPILER=clang
             nvim_package_name: nvim-linux-x86_64.tar.gz
             llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON -DLLVM_ENABLE_LLD=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PLUGINS=OFF -DLLVM_STATIC_LINK_CXX_STDLIB=ON
@@ -94,7 +93,6 @@ jobs:
             extension: ""
           - os: macos-latest
             image: null
-            btop_build_options: ""
             nvim_build_options: -GNinja -DCMAKE_C_COMPILER=clang -DCMAKE_FIND_FRAMEWORK=NEVER -DENABLE_LIBINTL=OFF
             nvim_package_name: nvim-macos-arm64.tar.gz
             llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON
@@ -102,7 +100,6 @@ jobs:
             extension: ""
           - os: windows-2022
             image: null
-            btop_build_options: ""
             nvim_build_options: -GNinja -DCMAKE_C_COMPILER=cl
             nvim_package_name: nvim-win64.zip
             llvm_build_options: -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DLLVM_ENABLE_ZLIB=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DLLVM_PARALLEL_LINK_JOBS=1
@@ -117,9 +114,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,btop,neovim,llvm,lldb,gontlm-proxy}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,neovim,llvm,lldb,gontlm-proxy,bottom}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,fish-shell}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
+          curl -Ls https://raw.githubusercontent.com/ClementTsang/bottom/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/bottom/LICENSE
           curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
           curl -Ls https://raw.githubusercontent.com/mikefarah/yq/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/yq/LICENSE
           curl -Ls https://raw.githubusercontent.com/wagoodman/dive/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/dive/LICENSE
@@ -132,7 +130,6 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/bazelbuild/bazelisk/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/bazelisk/LICENSE
           curl -Ls https://raw.githubusercontent.com/charmbracelet/vhs/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/vhs/LICENSE
           curl -Ls https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/COPYING -o "$GITHUB_WORKSPACE"/devenv/licenses/oh-my-posh/COPYING
-          curl -Ls https://raw.githubusercontent.com/aristocratos/btop/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/btop/LICENSE
           curl -Ls https://raw.githubusercontent.com/neovim/neovim/refs/heads/master/LICENSE.txt -o "$GITHUB_WORKSPACE"/devenv/licenses/neovim/LICENSE.txt
           curl -Ls https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/LICENSE.TXT -o "$GITHUB_WORKSPACE"/devenv/licenses/llvm/LICENSE.txt
           curl -Ls https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/lldb/LICENSE.TXT -o "$GITHUB_WORKSPACE"/devenv/licenses/lldb/LICENSE.txt
@@ -162,7 +159,7 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-APACHE
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-MIT
           curl -Ls https://raw.githubusercontent.com/fish-shell/fish-shell/refs/heads/master/COPYING -o "$GITHUB_WORKSPACE"/devenv/licenses/fish-shell/COPYING
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         if: ${{ matrix.os != 'ubuntu-latest' }}
         with:
           go-version: stable
@@ -187,14 +184,13 @@ jobs:
         run: |
           cp "$HOME"/go/bin/{yq,actionlint,age,age-keygen,bazelisk,buildifier,dive,fzf,shfmt,vhs}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
           ls "$GITHUB_WORKSPACE"/devenv/bin
-      - name: Download sources (oh-my-posh, btop, neovim, llvm)
+      - name: Download sources (oh-my-posh, neovim, llvm)
         run: |
           git clone --depth 1 https://github.com/JanDeDobbeleer/oh-my-posh.git
-          git clone --depth 1 https://github.com/aristocratos/btop.git btop-src
           git clone --depth 1 https://github.com/neovim/neovim.git neovim-src
           git clone --depth 1 https://github.com/bdwyertech/gontlm-proxy.git gontlm-proxy-src
           git clone --depth 1 https://github.com/Kitware/CMake.git cmake-src
-          git clone --branch llvmorg-20.1.8 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
+          git clone --branch llvmorg-21.1.3 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
           git clone --depth 1 https://github.com/fish-shell/fish-shell.git fish-shell-src
       - name: Build oh-my-posh
         if: ${{ matrix.os != 'windows-2022' }}
@@ -218,11 +214,6 @@ jobs:
         if: ${{ matrix.os == 'windows-2022' }}
         run: |
           .github/scripts/env.ps1
-      - name: Build btop
-        if: ${{ matrix.os != 'windows-2022' }}
-        run: |
-          make -C btop-src ${{ matrix.btop_build_options }}
-          cp btop-src/bin/btop "$GITHUB_WORKSPACE"/devenv/bin
       - name: Build neovim
         run: |
           cmake -S neovim-src/cmake.deps -B neovim-src/.deps -DCMAKE_BUILD_TYPE=Release ${{ matrix.nvim_build_options }}
@@ -277,6 +268,7 @@ jobs:
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
+          cargo install --locked bottom
           cargo install --locked du-dust
           cargo install --locked fd-find
           cargo install --locked ripgrep
@@ -292,26 +284,31 @@ jobs:
           cargo install --locked stylua
           cargo install --locked hexyl
           cargo install --locked typos-cli
+      - name: Rust tools (non-windows)
+        shell: bash
+        if: ${{ matrix.os != 'windows-2022' }}
+        run: |
           cargo install --locked deno
       - name: Add rust tools (Ubuntu)
         if: ${{ matrix.os == 'ubuntu-latest' }}
         shell: bash
         run: |
           ls /usr/local/rust/cargo/bin/
-          cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos} "$GITHUB_WORKSPACE"/devenv/bin
+          cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,btm} "$GITHUB_WORKSPACE"/devenv/bin
           cp /usr/local/rust/cargo/bin/fish* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Add rust tools
         if: ${{ matrix.os != 'ubuntu-latest' }}
         shell: bash
         run: |
           ls "$HOME"/.cargo/bin
-          cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,hexyl,typos,btm}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp "$HOME"/.cargo/bin/deno* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Package tools
         shell: bash
         run: |
           tar cfJ devenv-tools-${{ matrix.suffix }}.tar.xz devenv
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: artifact-tools-${{ matrix.suffix }}
           path: devenv-tools-${{ matrix.suffix }}.tar.xz
