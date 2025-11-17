@@ -32,12 +32,21 @@ PATH="$devenv_tools_dir/bin:$PATH"
 [[ -d "$devenv_tools_dir/llama.cpp/bin" ]] && PATH="$devenv_tools_dir/llama.cpp/bin:$PATH"
 export PATH
 
+git config --global include.path "$devenv_tools_dir"/gitconfig
+
 alias ls='lsd'
 alias cat='bat --paging=never'
 alias which='whence -p'
 alias for_all_files='fd --type f -x'
 alias find_and_replace='fd --type f -x sd'
 alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
+alias b='bazel'
+alias bb='bazel build'
+alias bt='bazel test'
+alias br='bazel run'
+
+alias gds='git diff --cached | nvim -'
+alias gdm='git diff origin/main | nvim -'
 
 is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
