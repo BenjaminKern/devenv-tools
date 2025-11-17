@@ -3,7 +3,16 @@ devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export EDITOR=nvim
 export SHELL=/bin/bash
 
-PATH=$devenv_tools_dir/bin:$PATH
+if [[ -d "$devenv_tools_dir/git/libexec/git-core" ]]; then
+  export GIT_EXEC_PATH="$devenv_tools_dir/git/libexec/git-core"
+  export GIT_TEMPLATE_DIR="$devenv_tools_dir/git/share/git-core/templates"
+  PATH="$devenv_tools_dir/bin:$devenv_tools_dir/git/bin:$PATH"
+else
+  PATH="$devenv_tools_dir/bin:$PATH"
+fi
+
+git config --global include.path "$devenv_tools_dir"/gitconfig
+
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 alias ls='lsd'
 alias cat='bat --paging=never'
@@ -60,6 +69,14 @@ HISTTIMEFORMAT='%F %T '
 alias for_all_files='fd --type f -x'
 alias find_and_replace='fd --type f -x sd'
 alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
+
+alias gds='git diff --cached | nvim -'
+alias gdm='git diff origin/main | nvim -'
+alias b='bazel'
+alias bb='bazel build'
+alias bt='bazel test'
+alias br='bazel run'
+
 
 eval "$(zoxide init --cmd j bash)"
 # eval "$(bat --completion bash)"
