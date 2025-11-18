@@ -81,7 +81,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
+          - macos-14
           - windows-2022
         include:
           - os: ubuntu-latest
@@ -91,7 +91,7 @@ jobs:
             llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON -DLLVM_ENABLE_LLD=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PLUGINS=OFF -DLLVM_STATIC_LINK_CXX_STDLIB=ON
             suffix: x86_64-linux
             extension: ""
-          - os: macos-latest
+          - os: macos-14
             image: null
             nvim_build_options: -GNinja -DCMAKE_C_COMPILER=clang -DCMAKE_FIND_FRAMEWORK=NEVER -DENABLE_LIBINTL=OFF
             nvim_package_name: nvim-macos-arm64.tar.gz
