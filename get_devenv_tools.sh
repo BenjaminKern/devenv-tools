@@ -8,9 +8,9 @@ if [[ -z "${1:-}" ]]; then
 fi
 
 echo "Downloading tools..."
-LLAMA_VERSION=$(curl -s https://api.github.com/repos/ggml-org/llama.cpp/releases/latest | jq -r .tag_name)
-SHELLCHECK_VERSION=$(curl -s https://api.github.com/repos/koalaman/shellcheck/releases/latest | jq -r .tag_name)
-HADOLINT_VERSION=$(curl -s https://api.github.com/repos/hadolint/hadolint/releases/latest | jq -r .tag_name)
+LLAMA_VERSION=$(curl -s https://api.github.com/repos/ggml-org/llama.cpp/releases/latest | jq -r .tag_name || echo "b7097")
+SHELLCHECK_VERSION=$(curl -s https://api.github.com/repos/koalaman/shellcheck/releases/latest | jq -r .tag_name || echo "v0.11.0")
+HADOLINT_VERSION=$(curl -s https://api.github.com/repos/hadolint/hadolint/releases/latest | jq -r .tag_name || echo "v2.14.0")
 
 if [[ "$(uname)" == "Darwin" ]]; then
   DESTDIR="$(realpath "$1")"
