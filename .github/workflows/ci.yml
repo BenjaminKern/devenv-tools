@@ -190,7 +190,7 @@ jobs:
           git clone --depth 1 https://github.com/neovim/neovim.git neovim-src
           git clone --depth 1 https://github.com/bdwyertech/gontlm-proxy.git gontlm-proxy-src
           git clone --depth 1 https://github.com/Kitware/CMake.git cmake-src
-          git clone --branch llvmorg-21.1.3 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
+          git clone --branch llvmorg-21.1.6 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
           git clone --depth 1 https://github.com/fish-shell/fish-shell.git fish-shell-src
       - name: Build oh-my-posh
         if: ${{ matrix.os != 'windows-2022' }}
