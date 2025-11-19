@@ -229,27 +229,7 @@ jobs:
         if: ${{ matrix.os == 'windows-2022' }}
         run: |
           Expand-Archive -Path build-neovim\${{ matrix.nvim_package_name }} -DestinationPath $env:GITHUB_WORKSPACE\devenv
-      - name: Clang tools/lldb configure
-        run: |
-          cmake -Bbuild-clangd -S llvm-src/llvm "-DLLVM_ENABLE_PROJECTS=clang;lldb;clang-tools-extra" -GNinja -DCMAKE_BUILD_TYPE=Release -DLLDB_INCLUDE_TESTS=OFF -DLLDB_ENABLE_LIBEDIT=OFF -DLLDB_ENABLE_CURSES=OFF -DLLDB_ENABLE_LIBXML2=OFF -DLLDB_ENABLE_PYTHON=OFF "-DLLVM_TARGETS_TO_BUILD=X86;AArch64;ARM" ${{ matrix.llvm_build_options }}
-      - name: Clang tools/lldb build
-        run: |
-          cmake --build build-clangd --target clang-tidy clangd clang-format clangd-indexer clang-doc lldb lldb-dap lldb-server
-      - name: Add clang tools/lldb
-        shell: bash
-        run: |
-          cp build-clangd/bin/{clang-tidy,clangd,clang-format,clangd-indexer,clang-doc,lldb,lldb-dap,lldb-server}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
-          cp -r build-clangd/lib/clang "$GITHUB_WORKSPACE"/devenv/lib
-      - name: Add neovim tools
-        shell: bash
-        if: ${{ matrix.os == 'windows-2022' }}
-        run: |
-          cp build-clangd/bin/*.dll "$GITHUB_WORKSPACE"/devenv/bin
-      - name: Add neovim tools
-        shell: bash
-        if: ${{ matrix.os != 'windows-2022' }}
-        run: |
-          cp build-clangd/lib/liblldb.* "$GITHUB_WORKSPACE"/devenv/lib
+
       - name: Prepare rust tools configuration
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
@@ -268,22 +248,22 @@ jobs:
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
-          cargo install --locked bottom
-          cargo install --locked du-dust
-          cargo install --locked fd-find
-          cargo install --locked ripgrep
-          cargo install --locked --git https://github.com/astral-sh/uv uv
-          cargo install --locked --git https://github.com/astral-sh/ruff ruff
-          cargo install --locked hyperfine
-          cargo install --locked bat
-          cargo install --locked sd
-          cargo install --locked lsd
-          cargo install --locked zoxide
-          cargo install --locked git-delta
-          cargo install --locked watchexec-cli
-          cargo install --locked stylua
-          cargo install --locked hexyl
-          cargo install --locked typos-cli
+          cargo install lsd
+          cargo install bottom
+          cargo install du-dust
+          cargo install fd-find
+          cargo install ripgrep
+          cargo install --git https://github.com/astral-sh/uv uv
+          cargo install --git https://github.com/astral-sh/ruff ruff
+          cargo install hyperfine
+          cargo install bat
+          cargo install sd
+          cargo install zoxide
+          cargo install git-delta
+          cargo install watchexec-cli
+          cargo install stylua
+          cargo install hexyl
+          cargo install typos-cli
       - name: Rust tools (non-windows)
         shell: bash
         if: ${{ matrix.os != 'windows-2022' }}
@@ -303,6 +283,27 @@ jobs:
           ls "$HOME"/.cargo/bin
           cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,hexyl,typos,btm}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
           cp "$HOME"/.cargo/bin/deno* "$GITHUB_WORKSPACE"/devenv/bin || true
+      - name: Clang tools/lldb configure
+        run: |
+          cmake -Bbuild-clangd -S llvm-src/llvm "-DLLVM_ENABLE_PROJECTS=clang;lldb;clang-tools-extra" -GNinja -DCMAKE_BUILD_TYPE=Release -DLLDB_INCLUDE_TESTS=OFF -DLLDB_ENABLE_LIBEDIT=OFF -DLLDB_ENABLE_CURSES=OFF -DLLDB_ENABLE_LIBXML2=OFF -DLLDB_ENABLE_PYTHON=OFF "-DLLVM_TARGETS_TO_BUILD=X86;AArch64;ARM" ${{ matrix.llvm_build_options }}
+      - name: Clang tools/lldb build
+        run: |
+          cmake --build build-clangd --target clang-tidy clangd clang-format clangd-indexer clang-doc lldb lldb-dap lldb-server
+      - name: Add clang tools/lldb
+        shell: bash
+        run: |
+          cp build-clangd/bin/{clang-tidy,clangd,clang-format,clangd-indexer,clang-doc,lldb,lldb-dap,lldb-server}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp -r build-clangd/lib/clang "$GITHUB_WORKSPACE"/devenv/lib
+      - name: Add clang tools
+        shell: bash
+        if: ${{ matrix.os == 'windows-2022' }}
+        run: |
+          cp build-clangd/bin/*.dll "$GITHUB_WORKSPACE"/devenv/bin
+      - name: Add clang tools
+        shell: bash
+        if: ${{ matrix.os != 'windows-2022' }}
+        run: |
+          cp build-clangd/lib/liblldb.* "$GITHUB_WORKSPACE"/devenv/lib
       - name: Package tools
         shell: bash
         run: |
