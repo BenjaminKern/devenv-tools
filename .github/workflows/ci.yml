@@ -260,7 +260,6 @@ jobs:
           cargo install sd
           cargo install zoxide
           cargo install git-delta
-          cargo install watchexec-cli
           cargo install stylua
           cargo install hexyl
           cargo install typos-cli
