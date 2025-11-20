@@ -14,12 +14,13 @@ HADOLINT_VERSION=$(curl -s https://api.github.com/repos/hadolint/hadolint/releas
 
 if [[ "$(uname)" == "Darwin" ]]; then
   DESTDIR="$(realpath "$1")"
-  NVIM_CONFIG_DIR="${DESTDIR}"/nvim-macos-arm64
+  NVIM_CONFIG_DIR="${DESTDIR}"
+  # NVIM_CONFIG_DIR="${DESTDIR}"/nvim-macos-arm64
   mkdir -p "$DESTDIR"/llama.cpp
   curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-aarch64-macos.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
   curl -sL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.darwin.aarch64.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"/bin
   curl -Ls https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-${LLAMA_VERSION}-bin-macos-arm64.zip | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
-  curl -Ls https://github.com/neovim/neovim/releases/download/nightly/nvim-macos-arm64.tar.gz | tar xfz - -C "$DESTDIR"
+  # curl -Ls https://github.com/neovim/neovim/releases/download/nightly/nvim-macos-arm64.tar.gz | tar xfz - -C "$DESTDIR"
   chmod u+x "$DESTDIR"/llama.cpp/bin/llama-*
   curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Darwin-arm64" -o "$DESTDIR"/bin/hadolint
   chmod u+x "$DESTDIR"/bin/hadolint
