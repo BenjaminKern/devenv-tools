@@ -91,6 +91,7 @@ jobs:
             llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON -DLLVM_ENABLE_LLD=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PLUGINS=OFF -DLLVM_STATIC_LINK_CXX_STDLIB=ON
             suffix: x86_64-linux
             extension: ""
+            cargo_tool_prefix: /usr/local/rust/cargo
           - os: macos-14
             image: null
             nvim_build_options: -GNinja -DCMAKE_C_COMPILER=clang -DCMAKE_FIND_FRAMEWORK=NEVER -DENABLE_LIBINTL=OFF
@@ -98,6 +99,7 @@ jobs:
             llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON
             suffix: aarch64-macos
             extension: ""
+            cargo_tool_prefix: $HOME/.cargo
           - os: windows-2022
             image: null
             nvim_build_options: -GNinja -DCMAKE_C_COMPILER=cl
@@ -105,6 +107,7 @@ jobs:
             llvm_build_options: -GNinja -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DLLVM_ENABLE_ZLIB=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DLLVM_PARALLEL_LINK_JOBS=1
             suffix: x86_64-windows
             extension: .exe
+            cargo_tool_prefix: $HOME/.cargo
     runs-on: ${{ matrix.os }}
     container:
       image: ${{ matrix.image }}
@@ -115,7 +118,7 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,neovim,llvm,lldb,gontlm-proxy,bottom}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,fish-shell}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
           curl -Ls https://raw.githubusercontent.com/ClementTsang/bottom/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/bottom/LICENSE
           curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
@@ -158,7 +161,6 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/hexyl/LICENSE-MIT
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-APACHE
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-MIT
-          curl -Ls https://raw.githubusercontent.com/fish-shell/fish-shell/refs/heads/master/COPYING -o "$GITHUB_WORKSPACE"/devenv/licenses/fish-shell/COPYING
       - uses: actions/setup-go@v6
         if: ${{ matrix.os != 'ubuntu-latest' }}
         with:
@@ -191,7 +193,6 @@ jobs:
           git clone --depth 1 https://github.com/bdwyertech/gontlm-proxy.git gontlm-proxy-src
           git clone --depth 1 https://github.com/Kitware/CMake.git cmake-src
           git clone --branch llvmorg-21.1.6 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
-          git clone --depth 1 https://github.com/fish-shell/fish-shell.git fish-shell-src
       - name: Build oh-my-posh
         if: ${{ matrix.os != 'windows-2022' }}
         run: |
@@ -236,18 +237,10 @@ jobs:
           echo "RUSTFLAGS=-Clink-arg=-fuse-ld=lld" >> "$GITHUB_ENV"
           echo "CC=clang" >> "$GITHUB_ENV"
           echo "CXX=clang++" >> "$GITHUB_ENV"
-      - name: Rust unix tools
-        shell: bash
-        if: ${{ matrix.os != 'windows-2022' }}
-        run: |
-          cd fish-shell-src
-          PCRE2_SYS_STATIC=1 cargo build --release --bin fish
-          ls target
-          cp target/release/fish* "$GITHUB_WORKSPACE"/devenv/bin
-          ls "$GITHUB_WORKSPACE"/devenv/bin
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
+          cargo install deno
           cargo install lsd
           cargo install bottom
           cargo install du-dust
@@ -263,25 +256,11 @@ jobs:
           cargo install stylua
           cargo install hexyl
           cargo install typos-cli
-      - name: Rust tools (non-windows)
-        shell: bash
-        if: ${{ matrix.os != 'windows-2022' }}
-        run: |
-          cargo install --locked deno
-      - name: Add rust tools (Ubuntu)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        shell: bash
-        run: |
-          ls /usr/local/rust/cargo/bin/
-          cp /usr/local/rust/cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,stylua,deno,hexyl,typos,btm} "$GITHUB_WORKSPACE"/devenv/bin
-          cp /usr/local/rust/cargo/bin/fish* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Add rust tools
-        if: ${{ matrix.os != 'ubuntu-latest' }}
         shell: bash
         run: |
-          ls "$HOME"/.cargo/bin
-          cp "$HOME"/.cargo/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
-          cp "$HOME"/.cargo/bin/deno* "$GITHUB_WORKSPACE"/devenv/bin || true
+          cp ${{ matrix.cargo_tool_prefix }}/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp ${{ matrix.cargo_tool_prefix }}/bin/deno* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Clang tools/lldb configure
         run: |
           cmake -Bbuild-clangd -S llvm-src/llvm "-DLLVM_ENABLE_PROJECTS=clang;lldb;clang-tools-extra" -GNinja -DCMAKE_BUILD_TYPE=Release -DLLDB_INCLUDE_TESTS=OFF -DLLDB_ENABLE_LIBEDIT=OFF -DLLDB_ENABLE_CURSES=OFF -DLLDB_ENABLE_LIBXML2=OFF -DLLDB_ENABLE_PYTHON=OFF "-DLLVM_TARGETS_TO_BUILD=X86;AArch64;ARM" ${{ matrix.llvm_build_options }}
