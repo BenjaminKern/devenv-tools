@@ -240,7 +240,7 @@ jobs:
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
-          cargo install deno
+          cargo install --locked deno
           cargo install lsd
           cargo install bottom
           cargo install du-dust
