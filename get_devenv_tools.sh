@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 shopt -s nullglob
+set -x
 
 if [[ -z "${1:-}" ]]; then
   echo "Usage: $0 <install-dir>"
@@ -8,6 +9,7 @@ if [[ -z "${1:-}" ]]; then
 fi
 
 echo "Downloading tools..."
+LIMA_VERSION=$(curl -s https://api.github.com/repos/lima-vm/lima/releases/latest | jq -r .tag_name || echo "v2.0.2")
 LLAMA_VERSION=$(curl -s https://api.github.com/repos/ggml-org/llama.cpp/releases/latest | jq -r .tag_name || echo "b7097")
 SHELLCHECK_VERSION=$(curl -s https://api.github.com/repos/koalaman/shellcheck/releases/latest | jq -r .tag_name || echo "v0.11.0")
 HADOLINT_VERSION=$(curl -s https://api.github.com/repos/hadolint/hadolint/releases/latest | jq -r .tag_name || echo "v2.14.0")
@@ -15,15 +17,13 @@ HADOLINT_VERSION=$(curl -s https://api.github.com/repos/hadolint/hadolint/releas
 if [[ "$(uname)" == "Darwin" ]]; then
   DESTDIR="$(realpath "$1")"
   NVIM_CONFIG_DIR="${DESTDIR}"
-  # NVIM_CONFIG_DIR="${DESTDIR}"/nvim-macos-arm64
   mkdir -p "$DESTDIR"/llama.cpp
   curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-aarch64-macos.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
   curl -sL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.darwin.aarch64.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"/bin
-  curl -Ls https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-${LLAMA_VERSION}-bin-macos-arm64.zip | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
-  # curl -Ls https://github.com/neovim/neovim/releases/download/nightly/nvim-macos-arm64.tar.gz | tar xfz - -C "$DESTDIR"
-  chmod u+x "$DESTDIR"/llama.cpp/bin/llama-*
+  curl -Ls https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-${LLAMA_VERSION}-bin-macos-arm64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
   curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Darwin-arm64" -o "$DESTDIR"/bin/hadolint
   chmod u+x "$DESTDIR"/bin/hadolint
+  curl -sL https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-Darwin-arm64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
 else
   DESTDIR="$(readlink -e "$1")"
   NVIM_CONFIG_DIR="${DESTDIR}"
@@ -31,6 +31,7 @@ else
   curl -sL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"/bin
   curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" -o "$DESTDIR"/bin/hadolint
   chmod u+x "$DESTDIR"/bin/hadolint
+  curl -sL https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-Linux-x86_64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
 fi
 
 mkdir -p "$DESTDIR"/{config,zsh-autosuggestions}
