@@ -78,8 +78,8 @@ alias bt='bazel test'
 alias br='bazel run'
 
 
-eval "$(zoxide init --cmd j bash)"
-# eval "$(bat --completion bash)"
+eval "$(bat --completion bash)"
 eval "$(fzf --bash)"
 eval "$(fd --gen-completions bash)"
 eval "$(oh-my-posh init bash --config $devenv_tools_dir/config/xyz.omp.json)"
+eval "$(zoxide init --cmd j bash)"
