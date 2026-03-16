@@ -29,9 +29,22 @@ rem Prepend custom tools to PATH
 set PATH=%BASE%bin;%BASE%nvim-win64\bin;%BASE%mingit\cmd;%BASE%clink;%BASE%busybox;%BASE%zig;%PATH%
 set "CLINK_PATH=%BASE%clink\scripts"
 
+rem Git config
+set "GIT_CONFIG_COUNT=1"
+set "GIT_CONFIG_KEY_0=include.path"
+set "GIT_CONFIG_VALUE_0=%BASE%gitconfig"
+
+rem Editor and FZF
+set "EDITOR=nvim"
+set "FZF_DEFAULT_COMMAND=fd --color never --type f --hidden --ignore-file %BASE%nvim-win64\share\nvim\.fd-ignore"
+
 rem Define doskey macros for the session
 doskey j=zoxide query $*
 doskey ff=fzf $*
+doskey ls=lsd $*
+doskey cat=bat --paging=never $*
+doskey gds=git diff --cached $*
+doskey gdm=git diff origin/main $*
 
 rem Inject clink and configure prompt
 "%BASE%clink\clink_x64.exe" inject

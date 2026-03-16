@@ -3,6 +3,7 @@ set -euo pipefail
 
 # === Versions ===
 GIT_VERSION="2.49.0"
+GIT_LFS_VERSION="3.7.1"
 CURL_VERSION="8.14.1"
 ZLIB_VERSION="2.2.4"
 EXPAT_VERSION="2.7.1"
@@ -58,6 +59,9 @@ make -j6 NO_TCLTK=YesPlease NO_GETTEXT=YesPlease NO_OPENSSL=YesPlease USE_CURL_F
   CURLDIR="$INSTALL_DIR" ZLIB_PATH="$INSTALL_DIR" EXPAT_PATH="$INSTALL_DIR" \
   prefix='/git' NO_INSTALL_HARDLINKS=YesPlease \
   CURL_LDFLAGS="$CURL_BUILD_FLAGS" DESTDIR="$INSTALL_DIR" install
+
+echo "==> Downloading git-lfs..."
+curl -sL "https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-amd64-v${GIT_LFS_VERSION}.tar.gz" | tar xfz - --strip=1 -C "$INSTALL_DIR/git/libexec/git-core" "git-lfs-${GIT_LFS_VERSION}/git-lfs"
 
 tar -C "$INSTALL_DIR" -czf "$TAR_PATH" git
 echo "📦 Archive created at: $TAR_PATH"

@@ -118,7 +118,7 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,neovim,llvm,lldb,gontlm-proxy,bottom}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,just,difftastic,tokei,ouch,yazi,zmx}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
           curl -Ls https://raw.githubusercontent.com/ClementTsang/bottom/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/bottom/LICENSE
           curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
@@ -161,6 +161,13 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/hexyl/LICENSE-MIT
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-APACHE
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-MIT
+          curl -Ls https://raw.githubusercontent.com/casey/just/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/just/LICENSE
+          curl -Ls https://raw.githubusercontent.com/Wilfred/difftastic/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/difftastic/LICENSE
+          curl -Ls https://raw.githubusercontent.com/XAMPPRocky/tokei/refs/heads/master/LICENCE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/tokei/LICENCE-MIT
+          curl -Ls https://raw.githubusercontent.com/XAMPPRocky/tokei/refs/heads/master/LICENCE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/tokei/LICENCE-APACHE
+          curl -Ls https://raw.githubusercontent.com/ouch-org/ouch/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/ouch/LICENSE
+          curl -Ls https://raw.githubusercontent.com/sxyazi/yazi/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/yazi/LICENSE
+          curl -Ls https://raw.githubusercontent.com/neurosnap/zmx/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/zmx/LICENSE
       - uses: actions/setup-go@v6
         if: ${{ matrix.os != 'ubuntu-latest' }}
         with:
@@ -192,7 +199,7 @@ jobs:
           git clone --depth 1 https://github.com/neovim/neovim.git neovim-src
           git clone --depth 1 https://github.com/bdwyertech/gontlm-proxy.git gontlm-proxy-src
           git clone --depth 1 https://github.com/Kitware/CMake.git cmake-src
-          git clone --branch llvmorg-21.1.8 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
+          git clone --branch llvmorg-22.1.1 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
       - name: Build oh-my-posh
         if: ${{ matrix.os != 'windows-2022' }}
         run: |
@@ -256,10 +263,15 @@ jobs:
           cargo install stylua
           cargo install hexyl
           cargo install typos-cli
+          cargo install just
+          cargo install difftastic
+          cargo install tokei
+          cargo install ouch
+          cargo install yazi-fm yazi-cli
       - name: Add rust tools
         shell: bash
         run: |
-          cp ${{ matrix.cargo_tool_prefix }}/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp ${{ matrix.cargo_tool_prefix }}/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm,just,difft,tokei,ouch,yazi}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
           cp ${{ matrix.cargo_tool_prefix }}/bin/deno* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Clang tools/lldb configure
         run: |

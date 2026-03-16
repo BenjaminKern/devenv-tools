@@ -9,10 +9,12 @@ if [[ -z "${1:-}" ]]; then
 fi
 
 echo "Downloading tools..."
-LIMA_VERSION=$(curl -s https://api.github.com/repos/lima-vm/lima/releases/latest | jq -r .tag_name || echo "v2.0.2")
-LLAMA_VERSION=$(curl -s https://api.github.com/repos/ggml-org/llama.cpp/releases/latest | jq -r .tag_name || echo "b7097")
-SHELLCHECK_VERSION=$(curl -s https://api.github.com/repos/koalaman/shellcheck/releases/latest | jq -r .tag_name || echo "v0.11.0")
-HADOLINT_VERSION=$(curl -s https://api.github.com/repos/hadolint/hadolint/releases/latest | jq -r .tag_name || echo "v2.14.0")
+LIMA_VERSION="v2.0.0"
+LLAMA_VERSION="b8373"
+SHELLCHECK_VERSION="v0.11.0"
+HADOLINT_VERSION="v2.14.0"
+ZMX_VERSION="0.4.1"
+COPILOT_CLI_VERSION="v1.0.5"
 
 if [[ "$(uname)" == "Darwin" ]]; then
   DESTDIR="$(realpath "$1")"
@@ -24,6 +26,8 @@ if [[ "$(uname)" == "Darwin" ]]; then
   curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Darwin-arm64" -o "$DESTDIR"/bin/hadolint
   chmod u+x "$DESTDIR"/bin/hadolint
   curl -sL https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-Darwin-arm64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
+  curl -Ls "https://zmx.sh/a/zmx-${ZMX_VERSION}-macos-aarch64.tar.gz" | tar xfz - -C "$DESTDIR"/bin
+  curl -sL "https://github.com/github/copilot-cli/releases/download/${COPILOT_CLI_VERSION}/copilot-darwin-arm64.tar.gz" | tar xfz - -C "$DESTDIR"/bin
 else
   DESTDIR="$(readlink -e "$1")"
   NVIM_CONFIG_DIR="${DESTDIR}"
@@ -32,6 +36,8 @@ else
   curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" -o "$DESTDIR"/bin/hadolint
   chmod u+x "$DESTDIR"/bin/hadolint
   curl -sL https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-Linux-x86_64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
+  curl -Ls "https://zmx.sh/a/zmx-${ZMX_VERSION}-linux-x86_64.tar.gz" | tar xfz - -C "$DESTDIR"/bin
+  curl -sL "https://github.com/github/copilot-cli/releases/download/${COPILOT_CLI_VERSION}/copilot-linux-x64.tar.gz" | tar xfz - -C "$DESTDIR"/bin
 fi
 
 mkdir -p "$DESTDIR"/{config,zsh-autosuggestions}

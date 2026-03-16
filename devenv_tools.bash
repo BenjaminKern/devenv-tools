@@ -1,7 +1,8 @@
 devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 ! [[ -f $devenv_tools_dir/devenv_tools.bash ]] && return
 export EDITOR=nvim
-export SHELL=/bin/bash
+SHELL="$(command -v bash)"
+export SHELL
 
 if [[ -d "$devenv_tools_dir/git/libexec/git-core" ]]; then
   export GIT_EXEC_PATH="$devenv_tools_dir/git/libexec/git-core"
@@ -11,11 +12,13 @@ else
   PATH="$devenv_tools_dir/bin:$PATH"
 fi
 
-git config --global include.path "$devenv_tools_dir"/gitconfig
+export GIT_CONFIG_COUNT=1
+export GIT_CONFIG_KEY_0="include.path"
+export GIT_CONFIG_VALUE_0="$devenv_tools_dir/gitconfig"
 
-export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
-alias ls='lsd'
-alias cat='bat --paging=never'
+command -v fd &>/dev/null && export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
+command -v lsd &>/dev/null && alias ls='lsd'
+command -v bat &>/dev/null && alias cat='bat --paging=never'
 
 is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
@@ -31,11 +34,11 @@ gv() {
   is_in_git_repo || return
 
   local filter
-  if [ -n $@ ] && [ -f $@ ]; then
-    filter="-- $@"
+  if [[ -n "$1" && -f "$1" ]]; then
+    filter="-- $1"
   fi
 
-  git lg $@ | \
+  git lg "$@" | \
     fzf \
       --ansi --no-sort --reverse --tiebreak=index \
       --preview "f() { set -- \$(echo -- \$@ | grep -o '[a-f0-9]\{7\}'); [ \$# -eq 0 ] || git show --color=always --format=fuller \$1 $filter | delta --line-numbers --syntax-theme=OneHalfDark; }; f {}" \
@@ -66,20 +69,25 @@ HISTFILESIZE=100000
 HISTCONTROL="erasedups:ignoreboth"
 export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
 HISTTIMEFORMAT='%F %T '
-alias for_all_files='fd --type f -x'
-alias find_and_replace='fd --type f -x sd'
-alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
+
+if [[ ! -w "${HISTFILE:-$HOME/.bash_history}" ]]; then
+  export HISTFILE="${TMPDIR:-/tmp}/.bash_history_$$"
+fi
+
+command -v fd &>/dev/null && alias for_all_files='fd --type f -x'
+command -v fd &>/dev/null && command -v sd &>/dev/null && alias find_and_replace='fd --type f -x sd'
+command -v fd &>/dev/null && alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
 
 alias gds='git diff --cached | nvim -'
 alias gdm='git diff origin/main | nvim -'
-alias b='bazel'
-alias bb='bazel build'
-alias bt='bazel test'
-alias br='bazel run'
+command -v bazel &>/dev/null && alias b='bazel'
+command -v bazel &>/dev/null && alias bb='bazel build'
+command -v bazel &>/dev/null && alias bt='bazel test'
+command -v bazel &>/dev/null && alias br='bazel run'
 
 
-eval "$(bat --completion bash)"
-eval "$(fzf --bash)"
-eval "$(fd --gen-completions bash)"
-eval "$(oh-my-posh init bash --config $devenv_tools_dir/config/xyz.omp.json)"
-eval "$(zoxide init --cmd j bash)"
+command -v bat &>/dev/null && eval "$(bat --completion bash)"
+command -v fzf &>/dev/null && eval "$(fzf --bash)"
+command -v fd &>/dev/null && eval "$(fd --gen-completions bash)"
+command -v oh-my-posh &>/dev/null && eval "$(oh-my-posh init bash --config "$devenv_tools_dir/config/xyz.omp.json")"
+command -v zoxide &>/dev/null && eval "$(zoxide init --cmd j bash)"
