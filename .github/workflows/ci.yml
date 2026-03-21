@@ -118,7 +118,7 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,neovim,llvm,lldb,gontlm-proxy,bottom}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,just,difftastic,tokei,ouch,zmx}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,just,difftastic,tokei,zmx}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
           curl -Ls https://raw.githubusercontent.com/ClementTsang/bottom/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/bottom/LICENSE
           curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
@@ -165,7 +165,6 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/Wilfred/difftastic/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/difftastic/LICENSE
           curl -Ls https://raw.githubusercontent.com/XAMPPRocky/tokei/refs/heads/master/LICENCE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/tokei/LICENCE-MIT
           curl -Ls https://raw.githubusercontent.com/XAMPPRocky/tokei/refs/heads/master/LICENCE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/tokei/LICENCE-APACHE
-          curl -Ls https://raw.githubusercontent.com/ouch-org/ouch/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/ouch/LICENSE
           curl -Ls https://raw.githubusercontent.com/neurosnap/zmx/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/zmx/LICENSE
       - uses: actions/setup-go@v6
         if: ${{ matrix.os != 'ubuntu-latest' }}
@@ -240,13 +239,12 @@ jobs:
       - name: Prepare rust tools configuration
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
-          echo "RUSTFLAGS=-Clink-arg=-fuse-ld=lld -Clink-arg=-lc++" >> "$GITHUB_ENV"
+          echo "RUSTFLAGS=-Clink-arg=-fuse-ld=lld" >> "$GITHUB_ENV"
           echo "CC=clang" >> "$GITHUB_ENV"
           echo "CXX=clang++" >> "$GITHUB_ENV"
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
-          cargo install ouch
           cargo install --locked deno
           cargo install lsd
           cargo install bottom
@@ -269,7 +267,7 @@ jobs:
       - name: Add rust tools
         shell: bash
         run: |
-          cp ${{ matrix.cargo_tool_prefix }}/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm,just,difft,tokei,ouch}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp ${{ matrix.cargo_tool_prefix }}/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm,just,difft,tokei}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
           cp ${{ matrix.cargo_tool_prefix }}/bin/deno* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Clang tools/lldb configure
         run: |
