@@ -31,13 +31,29 @@ if [[ "$(uname)" == "Darwin" ]]; then
 else
   DESTDIR="$(readlink -e "$1")"
   NVIM_CONFIG_DIR="${DESTDIR}"
-  curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-x86_64-linux.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
-  curl -sL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"/bin
-  curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" -o "$DESTDIR"/bin/hadolint
+  ARCH="$(uname -m)"
+  if [[ "$ARCH" == "aarch64" ]]; then
+    DEVENV_SUFFIX="aarch64-linux"
+    SHELLCHECK_ARCH="linux.aarch64"
+    HADOLINT_SUFFIX="Linux-arm64"
+    LIMA_SUFFIX="Linux-aarch64"
+    ZMX_SUFFIX="linux-aarch64"
+    COPILOT_SUFFIX="linux-arm64"
+  else
+    DEVENV_SUFFIX="x86_64-linux"
+    SHELLCHECK_ARCH="linux.x86_64"
+    HADOLINT_SUFFIX="Linux-x86_64"
+    LIMA_SUFFIX="Linux-x86_64"
+    ZMX_SUFFIX="linux-x86_64"
+    COPILOT_SUFFIX="linux-x64"
+  fi
+  curl -sL "https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-${DEVENV_SUFFIX}.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"
+  curl -sL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.${SHELLCHECK_ARCH}.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"/bin
+  curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${HADOLINT_SUFFIX}" -o "$DESTDIR"/bin/hadolint
   chmod u+x "$DESTDIR"/bin/hadolint
-  curl -sL https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-Linux-x86_64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
-  curl -Ls "https://zmx.sh/a/zmx-${ZMX_VERSION}-linux-x86_64.tar.gz" | tar xfz - -C "$DESTDIR"/bin
-  curl -sL "https://github.com/github/copilot-cli/releases/download/${COPILOT_CLI_VERSION}/copilot-linux-x64.tar.gz" | tar xfz - -C "$DESTDIR"/bin
+  curl -sL "https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-${LIMA_SUFFIX}.tar.gz" | tar xfz - --strip=1 -C "$DESTDIR"
+  curl -Ls "https://zmx.sh/a/zmx-${ZMX_VERSION}-${ZMX_SUFFIX}.tar.gz" | tar xfz - -C "$DESTDIR"/bin
+  curl -sL "https://github.com/github/copilot-cli/releases/download/${COPILOT_CLI_VERSION}/copilot-${COPILOT_SUFFIX}.tar.gz" | tar xfz - -C "$DESTDIR"/bin
 fi
 
 mkdir -p "$DESTDIR"/{config,zsh-autosuggestions}

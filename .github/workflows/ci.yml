@@ -81,6 +81,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+          - ubuntu-24.04-arm
           - macos-14
           - windows-2022
         include:
@@ -90,6 +91,14 @@ jobs:
             nvim_package_name: nvim-linux-x86_64.tar.gz
             llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON -DLLVM_ENABLE_LLD=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PLUGINS=OFF -DLLVM_STATIC_LINK_CXX_STDLIB=ON
             suffix: x86_64-linux
+            extension: ""
+            cargo_tool_prefix: /usr/local/rust/cargo
+          - os: ubuntu-24.04-arm
+            image: ghcr.io/benjaminkern/ci-images/ubuntu/20.04:main
+            nvim_build_options: -GNinja -DCMAKE_C_COMPILER=clang
+            nvim_package_name: nvim-linux-arm64.tar.gz
+            llvm_build_options: -DLLVM_ENABLE_LIBCXX=ON -DLLVM_USE_STATIC_ZSTD=ON -DLLVM_ENABLE_LLD=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PLUGINS=OFF -DLLVM_STATIC_LINK_CXX_STDLIB=ON
+            suffix: aarch64-linux
             extension: ""
             cargo_tool_prefix: /usr/local/rust/cargo
           - os: macos-14
@@ -167,7 +176,7 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/XAMPPRocky/tokei/refs/heads/master/LICENCE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/tokei/LICENCE-APACHE
           curl -Ls https://raw.githubusercontent.com/neurosnap/zmx/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/zmx/LICENSE
       - uses: actions/setup-go@v6
-        if: ${{ matrix.os != 'ubuntu-latest' }}
+        if: ${{ !matrix.image }}
         with:
           go-version: stable
       - name: Prepare go tools configuration
@@ -237,7 +246,7 @@ jobs:
           Expand-Archive -Path build-neovim\${{ matrix.nvim_package_name }} -DestinationPath $env:GITHUB_WORKSPACE\devenv
 
       - name: Prepare rust tools configuration
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.image }}
         run: |
           echo "RUSTFLAGS=-Clink-arg=-fuse-ld=lld" >> "$GITHUB_ENV"
           echo "CC=clang" >> "$GITHUB_ENV"
