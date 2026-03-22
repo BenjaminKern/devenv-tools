@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 shopt -s nullglob
-set -x
 
 if [[ -z "${1:-}" ]] || [[ -z "${2:-}" ]]; then
   echo "Usage: $0 <install-dir> <target>"
@@ -9,7 +8,6 @@ if [[ -z "${1:-}" ]] || [[ -z "${2:-}" ]]; then
   exit 1
 fi
 
-echo "Downloading tools..."
 LIMA_VERSION="v2.0.0"
 LLAMA_VERSION="b8373"
 SHELLCHECK_VERSION="v0.11.0"
@@ -57,15 +55,38 @@ else
 fi
 NVIM_CONFIG_DIR="${DESTDIR}"
 
+STEP=1
+TOTAL=13
+if [[ "$2" == "aarch64-macos" ]]; then
+  TOTAL=14
+fi
+
+progress() {
+  echo "[$STEP/$TOTAL] $1"
+  STEP=$((STEP + 1))
+}
+
+progress "devenv-tools (${DEVENV_SUFFIX})"
 curl -sL "https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-${DEVENV_SUFFIX}.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"
+
+progress "shellcheck ${SHELLCHECK_VERSION}"
 curl -sL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.${SHELLCHECK_ARCH}.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"/bin
+
+progress "hadolint ${HADOLINT_VERSION}"
 curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${HADOLINT_SUFFIX}" -o "$DESTDIR"/bin/hadolint
 chmod u+x "$DESTDIR"/bin/hadolint
+
+progress "lima ${LIMA_VERSION}"
 curl -sL "https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-${LIMA_SUFFIX}.tar.gz" | tar xfz - --strip=1 -C "$DESTDIR"
+
+progress "zmx ${ZMX_VERSION}"
 curl -Ls "https://zmx.sh/a/zmx-${ZMX_VERSION}-${ZMX_SUFFIX}.tar.gz" | tar xfz - -C "$DESTDIR"/bin
+
+progress "copilot-cli ${COPILOT_CLI_VERSION}"
 curl -sL "https://github.com/github/copilot-cli/releases/download/${COPILOT_CLI_VERSION}/copilot-${COPILOT_SUFFIX}.tar.gz" | tar xfz - -C "$DESTDIR"/bin
 
 if [[ "$2" == "aarch64-macos" ]]; then
+  progress "llama.cpp ${LLAMA_VERSION}"
   mkdir -p "$DESTDIR"/llama.cpp
   curl -Ls "https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-${LLAMA_VERSION}-bin-${LLAMA_SUFFIX}.tar.gz" | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
 fi
@@ -73,27 +94,31 @@ fi
 mkdir -p "$DESTDIR"/{config,zsh-autosuggestions}
 mkdir -p "$NVIM_CONFIG_DIR"/share/nvim/runtime/snippets
 
-echo "Downloading config..."
+progress "nvim config"
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/devenv_config.lua -o "$NVIM_CONFIG_DIR"/share/nvim/runtime/lua/devenv_config.lua
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/all.json -o "$NVIM_CONFIG_DIR"/share/nvim/runtime/snippets/all.json
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/snippets/cpp.json -o "$NVIM_CONFIG_DIR"/share/nvim/runtime/snippets/cpp.json
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/.fd-ignore -o "$DESTDIR"/share/nvim/.fd-ignore
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/refs/heads/main/.config/xyz.omp.json -o "$DESTDIR"/config/xyz.omp.json
 
-echo "Downloading devenv_tools.bash..."
+progress "devenv_tools.bash"
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/devenv_tools.bash -o "$DESTDIR"/devenv_tools.bash
-echo "Downloading devenv_tools.zsh..."
+
+progress "devenv_tools.zsh"
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/devenv_tools.zsh -o "$DESTDIR"/devenv_tools.zsh
 
-echo "Downloading gitconfig..."
+progress "gitconfig"
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/gitconfig -o "$DESTDIR"/gitconfig
 
-echo "Downloading zsh-autosuggestions..."
+progress "zsh-autosuggestions"
 curl -Ls https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz | tar xfz - --strip-components=1 -C "$DESTDIR"/zsh-autosuggestions
 
+progress "done"
+
+echo ""
 echo "Add the following line to ~/.zshrc"
-echo "source $DESTDIR/devenv_tools.zsh"
+echo "  source $DESTDIR/devenv_tools.zsh"
 echo "Add the following line to ~/.bashrc"
-echo "source $DESTDIR/devenv_tools.bash"
+echo "  source $DESTDIR/devenv_tools.bash"
 echo "Add the following line to ~/.config/nvim/init.lua"
-echo "require('devenv_config')"
+echo "  require('devenv_config')"
