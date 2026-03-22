@@ -3,8 +3,9 @@ set -euo pipefail
 shopt -s nullglob
 set -x
 
-if [[ -z "${1:-}" ]]; then
-  echo "Usage: $0 <install-dir>"
+if [[ -z "${1:-}" ]] || [[ -z "${2:-}" ]]; then
+  echo "Usage: $0 <install-dir> <target>"
+  echo "Valid targets: aarch64-macos, aarch64-linux, x86_64-linux"
   exit 1
 fi
 
@@ -16,44 +17,57 @@ HADOLINT_VERSION="v2.14.0"
 ZMX_VERSION="0.4.1"
 COPILOT_CLI_VERSION="v1.0.5"
 
-if [[ "$(uname)" == "Darwin" ]]; then
-  DESTDIR="$(realpath "$1")"
-  NVIM_CONFIG_DIR="${DESTDIR}"
-  mkdir -p "$DESTDIR"/llama.cpp
-  curl -sL https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-aarch64-macos.tar.xz | tar xfJ - --strip=1 -C "$DESTDIR"
-  curl -sL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.darwin.aarch64.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"/bin
-  curl -Ls https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-${LLAMA_VERSION}-bin-macos-arm64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
-  curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Darwin-arm64" -o "$DESTDIR"/bin/hadolint
-  chmod u+x "$DESTDIR"/bin/hadolint
-  curl -sL https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-Darwin-arm64.tar.gz | tar xfz - --strip=1 -C "$DESTDIR"
-  curl -Ls "https://zmx.sh/a/zmx-${ZMX_VERSION}-macos-aarch64.tar.gz" | tar xfz - -C "$DESTDIR"/bin
-  curl -sL "https://github.com/github/copilot-cli/releases/download/${COPILOT_CLI_VERSION}/copilot-darwin-arm64.tar.gz" | tar xfz - -C "$DESTDIR"/bin
-else
-  DESTDIR="$(readlink -e "$1")"
-  NVIM_CONFIG_DIR="${DESTDIR}"
-  ARCH="$(uname -m)"
-  if [[ "$ARCH" == "aarch64" ]]; then
+case "$2" in
+  aarch64-macos)
+    DEVENV_SUFFIX="aarch64-macos"
+    SHELLCHECK_ARCH="darwin.aarch64"
+    HADOLINT_SUFFIX="Darwin-arm64"
+    LLAMA_SUFFIX="macos-arm64"
+    LIMA_SUFFIX="Darwin-arm64"
+    ZMX_SUFFIX="macos-aarch64"
+    COPILOT_SUFFIX="darwin-arm64"
+    ;;
+  aarch64-linux)
     DEVENV_SUFFIX="aarch64-linux"
     SHELLCHECK_ARCH="linux.aarch64"
     HADOLINT_SUFFIX="Linux-arm64"
     LIMA_SUFFIX="Linux-aarch64"
     ZMX_SUFFIX="linux-aarch64"
     COPILOT_SUFFIX="linux-arm64"
-  else
+    ;;
+  x86_64-linux)
     DEVENV_SUFFIX="x86_64-linux"
     SHELLCHECK_ARCH="linux.x86_64"
     HADOLINT_SUFFIX="Linux-x86_64"
     LIMA_SUFFIX="Linux-x86_64"
     ZMX_SUFFIX="linux-x86_64"
     COPILOT_SUFFIX="linux-x64"
-  fi
-  curl -sL "https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-${DEVENV_SUFFIX}.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"
-  curl -sL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.${SHELLCHECK_ARCH}.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"/bin
-  curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${HADOLINT_SUFFIX}" -o "$DESTDIR"/bin/hadolint
-  chmod u+x "$DESTDIR"/bin/hadolint
-  curl -sL "https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-${LIMA_SUFFIX}.tar.gz" | tar xfz - --strip=1 -C "$DESTDIR"
-  curl -Ls "https://zmx.sh/a/zmx-${ZMX_VERSION}-${ZMX_SUFFIX}.tar.gz" | tar xfz - -C "$DESTDIR"/bin
-  curl -sL "https://github.com/github/copilot-cli/releases/download/${COPILOT_CLI_VERSION}/copilot-${COPILOT_SUFFIX}.tar.gz" | tar xfz - -C "$DESTDIR"/bin
+    ;;
+  *)
+    echo "Unknown target: $2"
+    echo "Valid targets: aarch64-macos, aarch64-linux, x86_64-linux"
+    exit 1
+    ;;
+esac
+
+if [[ "$(uname)" == "Darwin" ]]; then
+  DESTDIR="$(realpath "$1")"
+else
+  DESTDIR="$(readlink -e "$1")"
+fi
+NVIM_CONFIG_DIR="${DESTDIR}"
+
+curl -sL "https://github.com/BenjaminKern/devenv-tools/releases/download/latest/devenv-tools-${DEVENV_SUFFIX}.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"
+curl -sL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.${SHELLCHECK_ARCH}.tar.xz" | tar xfJ - --strip=1 -C "$DESTDIR"/bin
+curl -Ls "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${HADOLINT_SUFFIX}" -o "$DESTDIR"/bin/hadolint
+chmod u+x "$DESTDIR"/bin/hadolint
+curl -sL "https://github.com/lima-vm/lima/releases/download/${LIMA_VERSION}/lima-${LIMA_VERSION#v}-${LIMA_SUFFIX}.tar.gz" | tar xfz - --strip=1 -C "$DESTDIR"
+curl -Ls "https://zmx.sh/a/zmx-${ZMX_VERSION}-${ZMX_SUFFIX}.tar.gz" | tar xfz - -C "$DESTDIR"/bin
+curl -sL "https://github.com/github/copilot-cli/releases/download/${COPILOT_CLI_VERSION}/copilot-${COPILOT_SUFFIX}.tar.gz" | tar xfz - -C "$DESTDIR"/bin
+
+if [[ "$2" == "aarch64-macos" ]]; then
+  mkdir -p "$DESTDIR"/llama.cpp
+  curl -Ls "https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-${LLAMA_VERSION}-bin-${LLAMA_SUFFIX}.tar.gz" | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
 fi
 
 mkdir -p "$DESTDIR"/{config,zsh-autosuggestions}
@@ -73,10 +87,6 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/devenv
 
 echo "Downloading gitconfig..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/gitconfig -o "$DESTDIR"/gitconfig
-
-echo "Downloading github copilot auth tool..."
-curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/github_copilot_auth -o "$DESTDIR"/bin/github_copilot_auth
-chmod u+x "$DESTDIR"/bin/github_copilot_auth
 
 echo "Downloading zsh-autosuggestions..."
 curl -Ls https://github.com/zsh-users/zsh-autosuggestions/archive/master.tar.gz | tar xfz - --strip-components=1 -C "$DESTDIR"/zsh-autosuggestions

@@ -65,9 +65,6 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/devenv
 echo Downloading gitconfig...
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/gitconfig -o "%DESTDIR%\gitconfig" || goto :error
 
-echo Downloading github_copilot_auth...
-curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/github_copilot_auth -o "%DESTDIR%\bin\github_copilot_auth" || goto :error
-
 set CMDLIST=cat cksum clear cp ls mv rm base64 cut env head tail md5sum mktemp realpath readlink sha256sum sleep split tee touch whoami yes wc pwd unzip
 
 for %%C in (%CMDLIST%) do (
