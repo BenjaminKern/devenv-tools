@@ -8,12 +8,12 @@ if [[ -z "${1:-}" ]] || [[ -z "${2:-}" ]]; then
   exit 1
 fi
 
-LIMA_VERSION="v2.1.1"
-LLAMA_VERSION="b9070"
+LIMA_VERSION="v2.1.3"
+LLAMA_VERSION="b9741"
 SHELLCHECK_VERSION="v0.11.0"
 HADOLINT_VERSION="v2.14.0"
-ZMX_VERSION="0.5.0"
-COPILOT_CLI_VERSION="v1.0.43"
+ZMX_VERSION="0.6.0"
+COPILOT_CLI_VERSION="v1.0.63"
 
 case "$2" in
   aarch64-macos)
