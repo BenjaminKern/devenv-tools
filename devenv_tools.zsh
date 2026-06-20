@@ -7,9 +7,12 @@ if [[ ! -f "$devenv_tools_dir/devenv_tools.zsh" ]]; then
   return
 fi
 
+PATH="$devenv_tools_dir/bin:$PATH"
+[[ -d "$devenv_tools_dir/llama.cpp" ]] && PATH="$devenv_tools_dir/llama.cpp:$PATH"
+export PATH
+
 export EDITOR=nvim
 export CLICOLOR=1
-export STARSHIP_CONFIG="$devenv_tools_dir/config/starship.toml"
 command -v fd &>/dev/null && export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 
 setopt nobeep autocd share_history
@@ -28,10 +31,6 @@ if [[ -f "$devenv_tools_dir/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; the
   export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#82aaff,bg=#222436,bold,underline"
 fi
 
-PATH="$devenv_tools_dir/bin:$PATH"
-[[ -d "$devenv_tools_dir/llama.cpp/bin" ]] && PATH="$devenv_tools_dir/llama.cpp/bin:$PATH"
-export PATH
-
 export GIT_CONFIG_COUNT=1
 export GIT_CONFIG_KEY_0="include.path"
 export GIT_CONFIG_VALUE_0="$devenv_tools_dir/gitconfig"
@@ -42,10 +41,6 @@ alias which='whence -p'
 command -v fd &>/dev/null && alias for_all_files='fd --type f -x'
 command -v fd &>/dev/null && command -v sd &>/dev/null && alias find_and_replace='fd --type f -x sd'
 command -v fd &>/dev/null && alias clang_format_files='fd -e h -e cpp -e c -x clang-format -i'
-command -v bazel &>/dev/null && alias b='bazel'
-command -v bazel &>/dev/null && alias bb='bazel build'
-command -v bazel &>/dev/null && alias bt='bazel test'
-command -v bazel &>/dev/null && alias br='bazel run'
 
 alias gds='git diff --cached | nvim -'
 alias gdm='git diff origin/main | nvim -'

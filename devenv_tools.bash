@@ -80,10 +80,6 @@ command -v fd &>/dev/null && alias clang_format_files='fd -e h -e cpp -e c -x cl
 
 alias gds='git diff --cached | nvim -'
 alias gdm='git diff origin/main | nvim -'
-command -v bazel &>/dev/null && alias b='bazel'
-command -v bazel &>/dev/null && alias bb='bazel build'
-command -v bazel &>/dev/null && alias bt='bazel test'
-command -v bazel &>/dev/null && alias br='bazel run'
 
 
 command -v bat &>/dev/null && eval "$(bat --completion bash)"
