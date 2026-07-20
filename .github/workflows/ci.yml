@@ -175,7 +175,7 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/XAMPPRocky/tokei/refs/heads/master/LICENCE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/tokei/LICENCE-MIT
           curl -Ls https://raw.githubusercontent.com/XAMPPRocky/tokei/refs/heads/master/LICENCE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/tokei/LICENCE-APACHE
           curl -Ls https://raw.githubusercontent.com/neurosnap/zmx/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/zmx/LICENSE
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         if: ${{ !matrix.image }}
         with:
           go-version: stable
