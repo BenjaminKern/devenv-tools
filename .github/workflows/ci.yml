@@ -274,7 +274,12 @@ jobs:
       - name: Add rust tools
         shell: bash
         run: |
-          cp ${{ matrix.cargo_tool_prefix }}/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm,just,difft,tokei}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp ${{ matrix.cargo_tool_prefix }}/bin/{dust,fd,rg,uv,uvx,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm,just,difft,tokei}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+      - name: Add ruff
+        if: ${{ matrix.os != 'windows-2022' }}
+        shell: bash
+        run: |
+          cp ${{ matrix.cargo_tool_prefix }}/bin/ruff "$GITHUB_WORKSPACE"/devenv/bin
       - name: Clang tools/lldb configure
         run: |
           cmake -Bbuild-clangd -S llvm-src/llvm "-DLLVM_ENABLE_PROJECTS=clang;lldb;clang-tools-extra" -GNinja -DCMAKE_BUILD_TYPE=Release -DLLDB_INCLUDE_TESTS=OFF -DLLDB_ENABLE_LIBEDIT=OFF -DLLDB_ENABLE_CURSES=OFF -DLLDB_ENABLE_LIBXML2=OFF -DLLDB_ENABLE_PYTHON=OFF "-DLLVM_TARGETS_TO_BUILD=X86;AArch64;ARM" ${{ matrix.llvm_build_options }}
