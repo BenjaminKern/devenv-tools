@@ -35,7 +35,7 @@ fi
 export GIT_CONFIG_COUNT=1
 export GIT_CONFIG_KEY_0="include.path"
 export GIT_CONFIG_VALUE_0="$devenv_tools_dir/gitconfig"
-export PI_CODING_AGENT_DIR="$devenv_tools_dir/pi_settings"
+export PI_CODING_AGENT_DIR="$devenv_tools_dir/.pi"
 
 command -v lsd &>/dev/null && alias ls='lsd'
 command -v bat &>/dev/null && alias cat='bat --paging=never'

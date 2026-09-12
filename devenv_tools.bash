@@ -17,7 +17,7 @@ fi
 export GIT_CONFIG_COUNT=1
 export GIT_CONFIG_KEY_0="include.path"
 export GIT_CONFIG_VALUE_0="$devenv_tools_dir/gitconfig"
-export PI_CODING_AGENT_DIR="$devenv_tools_dir/pi"
+export PI_CODING_AGENT_DIR="$devenv_tools_dir/.pi"
 
 command -v fd &>/dev/null && export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 command -v lsd &>/dev/null && alias ls='lsd'

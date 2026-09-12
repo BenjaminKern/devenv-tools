@@ -127,7 +127,7 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,neovim,llvm,lldb,gontlm-proxy,bottom}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,deno,hexyl,typos,just,difftastic,tokei,zmx}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,hexyl,typos,just,difftastic,tokei,zmx}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
           curl -Ls https://raw.githubusercontent.com/ClementTsang/bottom/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/bottom/LICENSE
           curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
@@ -165,7 +165,6 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/dandavison/delta/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/delta/LICENSE
           curl -Ls https://raw.githubusercontent.com/watchexec/watchexec/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/watchexec/LICENSE
           curl -Ls https://raw.githubusercontent.com/JohnnyMorganz/StyLua/refs/heads/main/LICENSE.md -o "$GITHUB_WORKSPACE"/devenv/licenses/stylua/LICENSE.md
-          curl -Ls https://raw.githubusercontent.com/denoland/deno/refs/heads/main/LICENSE.md -o "$GITHUB_WORKSPACE"/devenv/licenses/deno/LICENSE.md
           curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/hexyl/LICENSE-APACHE
           curl -Ls https://raw.githubusercontent.com/sharkdp/hexyl/refs/heads/master/LICENSE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/hexyl/LICENSE-MIT
           curl -Ls https://raw.githubusercontent.com/crate-ci/typos/refs/heads/master/LICENSE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/typos/LICENSE-APACHE
@@ -206,7 +205,7 @@ jobs:
           git clone --depth 1 https://github.com/neovim/neovim.git neovim-src
           git clone --depth 1 https://github.com/bdwyertech/gontlm-proxy.git gontlm-proxy-src
           git clone --depth 1 https://github.com/Kitware/CMake.git cmake-src
-          git clone --branch llvmorg-22.1.8 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
+          git clone --branch llvmorg-23.1.1 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
       - name: Build oh-my-posh
         if: ${{ matrix.os != 'windows-2022' }}
         run: |
@@ -254,7 +253,6 @@ jobs:
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
-          cargo install --locked deno
           cargo install lsd
           cargo install bottom
           cargo install du-dust
@@ -277,7 +275,6 @@ jobs:
         shell: bash
         run: |
           cp ${{ matrix.cargo_tool_prefix }}/bin/{dust,fd,rg,uv,uvx,ruff,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm,just,difft,tokei}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
-          cp ${{ matrix.cargo_tool_prefix }}/bin/deno* "$GITHUB_WORKSPACE"/devenv/bin || true
       - name: Clang tools/lldb configure
         run: |
           cmake -Bbuild-clangd -S llvm-src/llvm "-DLLVM_ENABLE_PROJECTS=clang;lldb;clang-tools-extra" -GNinja -DCMAKE_BUILD_TYPE=Release -DLLDB_INCLUDE_TESTS=OFF -DLLDB_ENABLE_LIBEDIT=OFF -DLLDB_ENABLE_CURSES=OFF -DLLDB_ENABLE_LIBXML2=OFF -DLLDB_ENABLE_PYTHON=OFF "-DLLVM_TARGETS_TO_BUILD=X86;AArch64;ARM" ${{ matrix.llvm_build_options }}
