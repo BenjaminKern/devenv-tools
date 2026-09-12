@@ -261,7 +261,7 @@ jobs:
           cargo install lsd
           cargo install bottom
           cargo install du-dust
-          cargo install fd-find
+          cargo install fd-find --locked
           cargo install ripgrep
           cargo install --git https://github.com/astral-sh/uv uv
           cargo install --git https://github.com/astral-sh/ruff ruff
