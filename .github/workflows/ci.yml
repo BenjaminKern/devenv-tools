@@ -243,7 +243,12 @@ jobs:
         if: ${{ matrix.os == 'windows-2022' }}
         run: |
           Expand-Archive -Path build-neovim\${{ matrix.nvim_package_name }} -DestinationPath $env:GITHUB_WORKSPACE\devenv
-
+      - name: Windows workarounds
+        if: ${{ matrix.os == 'windows-2022' }}
+        run: |
+          $env:CARGO_HOME = "C:\cargo"
+          echo "CARGO_HOME=C:\cargo" >> $env:GITHUB_ENV
+          reg add HKLM\SYSTEM\CurrentControlSet\Control\FileSystem /v LongPathsEnabled /d 1 /f
       - name: Prepare rust tools configuration
         if: ${{ matrix.image }}
         run: |
