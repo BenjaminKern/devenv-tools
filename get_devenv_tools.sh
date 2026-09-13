@@ -86,7 +86,8 @@ mkdir -p "$DESTDIR"/llama.cpp
 curl -Ls "https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-${LLAMA_VERSION}-bin-${LLAMA_SUFFIX}.tar.gz" | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
 
 progress "bun ${BUN_VERSION}"
-curl -Ls "https://github.com/oven-sh/bun/releases/download/bun-${BUN_VERSION}/bun-${BUN_SUFFIX}.zip" | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
+curl -Ls "https://github.com/oven-sh/bun/releases/download/bun-${BUN_VERSION}/bun-${BUN_SUFFIX}.zip" | tar xf - --strip=1 -C "$DESTDIR"/bin
+chmod u+x "$DESTDIR"/bin/bun
 
 mkdir -p "$DESTDIR"/{config,zsh-autosuggestions}
 mkdir -p "$NVIM_CONFIG_DIR"/share/nvim/runtime/snippets
