@@ -14,6 +14,9 @@ HADOLINT_VERSION="v2.14.0"
 ZMX_VERSION="0.8.1"
 PI_AGENT_VERSION="v0.85.1"
 BUN_VERSION="v1.4.2"
+OPENSPEC_VERSION="1.13.2"
+DEVCONTAINER_CLI_VERSION="0.89.0"
+PRECOMMIT_VERSION="4.6.2"
 
 case "$2" in
   aarch64-macos)
@@ -58,7 +61,7 @@ fi
 NVIM_CONFIG_DIR="${DESTDIR}"
 
 STEP=1
-TOTAL=13
+TOTAL=16
 
 progress() {
   echo "[$STEP/$TOTAL] $1"
@@ -88,6 +91,27 @@ curl -Ls "https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSIO
 progress "bun ${BUN_VERSION}"
 curl -Ls "https://github.com/oven-sh/bun/releases/download/bun-${BUN_VERSION}/bun-${BUN_SUFFIX}.zip" | tar xf - --strip=1 -C "$DESTDIR"/bin
 chmod u+x "$DESTDIR"/bin/bun
+
+progress "openspec ${OPENSPEC_VERSION} (bun x wrapper)"
+sed "s/__VERSION__/${OPENSPEC_VERSION}/" > "$DESTDIR"/bin/openspec <<'EOF'
+#!/bin/sh
+exec "$(dirname "$0")/bun" x @fission-ai/openspec@__VERSION__ openspec "$@"
+EOF
+chmod u+x "$DESTDIR"/bin/openspec
+
+progress "devcontainer ${DEVCONTAINER_CLI_VERSION} (bun x wrapper)"
+sed "s/__VERSION__/${DEVCONTAINER_CLI_VERSION}/" > "$DESTDIR"/bin/devcontainer <<'EOF'
+#!/bin/sh
+exec "$(dirname "$0")/bun" x @devcontainers/cli@__VERSION__ devcontainer "$@"
+EOF
+chmod u+x "$DESTDIR"/bin/devcontainer
+
+progress "pre-commit ${PRECOMMIT_VERSION} (uvx wrapper)"
+sed "s/__VERSION__/${PRECOMMIT_VERSION}/" > "$DESTDIR"/bin/pre-commit <<'EOF'
+#!/bin/sh
+exec "$(dirname "$0")/uvx" "pre-commit@__VERSION__" "$@"
+EOF
+chmod u+x "$DESTDIR"/bin/pre-commit
 
 mkdir -p "$DESTDIR"/{config,zsh-autosuggestions}
 mkdir -p "$NVIM_CONFIG_DIR"/share/nvim/runtime/snippets
@@ -121,6 +145,9 @@ echo "  source $DESTDIR/devenv_tools.bash"
 echo "Add the following line to ~/.config/nvim/init.lua"
 echo "  require('devenv_config')"
 echo "Consider installing"
-echo "  pi install npm:pi-blackhole"
 echo "  pi install npm:pi-subagents"
+echo "  pi install npm:@sting8k/pi-vcc"
+echo "  pi install npm:@sting8k/pi-droid-styling"
+echo "  pi install npm:@sting8k/pi-utils"
+echo "  pi install npm:pi-simplify"
 
