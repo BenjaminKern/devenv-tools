@@ -263,6 +263,7 @@ jobs:
       # binary so the image's /usr/local/zig can never win the PATH lookup: herdr's
       # crates/ghostty-vt/build.rs honours $ZIG and only falls back to `zig`.
       - name: Verify Zig
+        if: ${{ matrix.os != 'windows-2022' }}
         shell: bash
         run: |
           zig version
@@ -271,6 +272,16 @@ jobs:
             *) echo "expected zig 0.16.x, got $(zig version) ($(command -v zig))"; exit 1 ;;
           esac
           echo "ZIG=$(command -v zig)" >> "$GITHUB_ENV"
+      # Needs pwsh, not bash: under git bash `command -v zig` yields an MSYS path
+      # (/d/a/_temp/.../zig) that Rust's Command::new cannot spawn, which made the
+      # ghostty-vt build script die with "zig executable not found".
+      - name: Verify Zig (Windows)
+        if: ${{ matrix.os == 'windows-2022' }}
+        shell: pwsh
+        run: |
+          zig version
+          if ((zig version) -notlike "0.16.*") { throw "expected zig 0.16.x, got $(zig version)" }
+          "ZIG=$((Get-Command zig).Source)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
