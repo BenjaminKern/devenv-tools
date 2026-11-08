@@ -82,7 +82,7 @@ jobs:
         os:
           - ubuntu-latest
           - ubuntu-24.04-arm
-          - macos-14
+          - macos-15
           - windows-2022
         include:
           - os: ubuntu-latest
@@ -101,7 +101,7 @@ jobs:
             suffix: aarch64-linux
             extension: ""
             cargo_tool_prefix: /usr/local/rust/cargo
-          - os: macos-14
+          - os: macos-15
             image: null
             nvim_build_options: -GNinja -DCMAKE_C_COMPILER=clang -DCMAKE_FIND_FRAMEWORK=NEVER -DENABLE_LIBINTL=OFF
             nvim_package_name: nvim-macos-arm64.tar.gz
