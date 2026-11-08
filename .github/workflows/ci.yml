@@ -24,11 +24,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # Need full history to work with tags
       - name: Fetch artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: artifact-*
           merge-multiple: true
@@ -55,7 +55,7 @@ jobs:
           git tag latest
           git push origin latest
       - name: Create latest release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           tag_name: latest
           name: Latest Development Build
@@ -121,7 +121,7 @@ jobs:
     container:
       image: ${{ matrix.image }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Prepare tools folder, and fetch all licenses
         shell: bash
         run: |
@@ -175,7 +175,7 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/XAMPPRocky/tokei/refs/heads/master/LICENCE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/tokei/LICENCE-APACHE
           curl -Ls https://raw.githubusercontent.com/neurosnap/zmx/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/zmx/LICENSE
           curl -Ls https://raw.githubusercontent.com/herdrdev/herdr/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/herdr/LICENSE
-      - uses: actions/setup-go@v7
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         if: ${{ !matrix.image }}
         with:
           go-version: stable
@@ -251,6 +251,15 @@ jobs:
           echo "RUSTFLAGS=-Clink-arg=-fuse-ld=lld" >> "$GITHUB_ENV"
           echo "CC=clang" >> "$GITHUB_ENV"
           echo "CXX=clang++" >> "$GITHUB_ENV"
+      # herdr vendors libghostty-vt, whose build.rs shells out to zig.
+      # Keep this in sync with ZIG_VERSION in ci-images/.github/workflows/docker-image.yml
+      # so every platform builds against the same compiler; the linux container
+      # image already ships it, so only the bare macOS/Windows runners install it.
+      - name: Install Zig
+        if: ${{ !matrix.image }}
+        uses: xyzzylabs/setup-zig@2082e552e19803253444ed0f0124948d16e9a926 # v1.0.6
+        with:
+          version: 0.17.0
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
@@ -308,7 +317,7 @@ jobs:
         run: |
           tar cfJ devenv-tools-${{ matrix.suffix }}.tar.xz devenv
       - name: Upload
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: artifact-tools-${{ matrix.suffix }}
           path: devenv-tools-${{ matrix.suffix }}.tar.xz
