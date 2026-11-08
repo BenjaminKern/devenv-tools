@@ -11,7 +11,6 @@ if [[ -d "$devenv_tools_dir/git/libexec/git-core" ]]; then
 else
   PATH="$devenv_tools_dir/bin:$PATH"
 fi
-[[ -d "$devenv_tools_dir/llama.cpp" ]] && PATH="$devenv_tools_dir/llama.cpp:$PATH"
 [[ -d "$devenv_tools_dir/pi" ]] && PATH="$devenv_tools_dir/pi:$PATH"
 
 export GIT_CONFIG_COUNT=1

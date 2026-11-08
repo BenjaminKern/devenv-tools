@@ -7,10 +7,17 @@ if "%~1"=="" (
 )
 set "DESTDIR=%~1"
 
-set "MINGIT_VERSION=2.49.0"
-set "CLINK_VERSION=1.7.19"
-set "CLINK_HASH=d8a218"
-set "ZIG_VERSION=0.14.1"
+set "MINGIT_VERSION=2.56.0.windows.4"
+set "MINGIT_ASSET_VERSION=2.56.0.4"
+set "CLINK_VERSION=1.9.35"
+set "CLINK_HASH=fa48d0"
+set "ZIG_VERSION=0.17.1"
+set "HADOLINT_VERSION=v2.15.1"
+set "PI_AGENT_VERSION=v1.5.0"
+set "BUN_VERSION=v1.4.4"
+set "OPENSPEC_VERSION=1.16.1"
+set "DEVCONTAINER_CLI_VERSION=0.90.0"
+set "PRECOMMIT_VERSION=4.7.0"
 
 where curl >nul 2>&1 || (
     echo Error: curl not found in PATH
@@ -40,7 +47,7 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/refs/heads/main
 
 if not exist "%DESTDIR%\mingit" mkdir "%DESTDIR%\mingit"
 echo Downloading mingit...
-curl -sL https://github.com/git-for-windows/git/releases/download/v%MINGIT_VERSION%.windows.1/MinGit-%MINGIT_VERSION%-busybox-64-bit.zip -o "%TEMP%\mingit.zip" || goto :error
+curl -sL https://github.com/git-for-windows/git/releases/download/v%MINGIT_VERSION%/MinGit-%MINGIT_ASSET_VERSION%-busybox-64-bit.zip -o "%TEMP%\mingit.zip" || goto :error
 tar xf "%TEMP%\mingit.zip" -C "%DESTDIR%\mingit" || goto :error
 del "%TEMP%\mingit.zip"
 
@@ -58,6 +65,39 @@ echo Downloading zig...
 curl -sL https://ziglang.org/download/%ZIG_VERSION%/zig-x86_64-windows-%ZIG_VERSION%.zip -o "%TEMP%\zig.zip" || goto :error
 tar xf "%TEMP%\zig.zip" --strip=1 -C "%DESTDIR%\zig" || goto :error
 del "%TEMP%\zig.zip"
+
+if not exist "%DESTDIR%\bin" mkdir "%DESTDIR%\bin"
+echo Downloading hadolint...
+curl -sL https://github.com/hadolint/hadolint/releases/download/%HADOLINT_VERSION%/hadolint-windows-x86_64.exe -o "%DESTDIR%\bin\hadolint.exe" || goto :error
+
+echo Downloading bun...
+curl -sL https://github.com/oven-sh/bun/releases/download/bun-%BUN_VERSION%/bun-windows-x64.zip -o "%TEMP%\bun-win.zip" || goto :error
+tar xf "%TEMP%\bun-win.zip" --strip=1 -C "%DESTDIR%\bin" || goto :error
+del "%TEMP%\bun-win.zip"
+
+if not exist "%DESTDIR%\pi" mkdir "%DESTDIR%\pi"
+echo Downloading pi-agent...
+curl -sL https://github.com/earendil-works/pi/releases/download/%PI_AGENT_VERSION%/pi-windows-x64.zip -o "%TEMP%\pi-agent.zip" || goto :error
+tar xf "%TEMP%\pi-agent.zip" -C "%DESTDIR%\pi" || goto :error
+del "%TEMP%\pi-agent.zip"
+
+echo Configuring pi (npmCommand=bun)...
+if not exist "%DESTDIR%\.pi" mkdir "%DESTDIR%\.pi"
+if not exist "%DESTDIR%\.pi\settings.json" echo { "npmCommand": ["bun"] } > "%DESTDIR%\.pi\settings.json"
+
+echo Creating command wrappers...
+(
+    echo @echo off
+    echo "%%~dp0bun.exe" x @fission-ai/openspec@%OPENSPEC_VERSION% openspec %%*
+) > "%DESTDIR%\bin\openspec.bat"
+(
+    echo @echo off
+    echo "%%~dp0bun.exe" x @devcontainers/cli@%DEVCONTAINER_CLI_VERSION% devcontainer %%*
+) > "%DESTDIR%\bin\devcontainer.bat"
+(
+    echo @echo off
+    echo "%%~dp0uvx.exe" pre-commit@%PRECOMMIT_VERSION% %%*
+) > "%DESTDIR%\bin\pre-commit.bat"
 
 echo Downloading devenv_tools.bat...
 curl -sL https://raw.githubusercontent.com/BenjaminKern/devenv-tools/main/devenv_tools.bat -o "%DESTDIR%\devenv_tools.bat" || goto :error
@@ -80,6 +120,12 @@ echo Setup complete! Tools installed to: "%DESTDIR%"
 echo Add 'cmd.exe /k "%DESTDIR%"\devenv_tools.bat' to Command Line command
 echo Add the following line to %LOCALAPPDATA%\nvim\init.lua
 echo require('devenv_config'^)
+echo Consider installing pi extensions
+echo   pi install npm:pi-subagents
+echo   pi install npm:@sting8k/pi-vcc
+echo   pi install npm:@sting8k/pi-droid-styling
+echo   pi install npm:@sting8k/pi-utils
+echo   pi install npm:pi-simplify
 exit /b 0
 
 :error

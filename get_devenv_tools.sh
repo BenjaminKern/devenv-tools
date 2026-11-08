@@ -8,22 +8,20 @@ if [[ -z "${1:-}" ]] || [[ -z "${2:-}" ]]; then
   exit 1
 fi
 
-LLAMA_VERSION="b10924"
 SHELLCHECK_VERSION="v0.11.0"
-HADOLINT_VERSION="v2.14.0"
-ZMX_VERSION="0.8.1"
-PI_AGENT_VERSION="v0.85.1"
-BUN_VERSION="v1.4.2"
-OPENSPEC_VERSION="1.13.2"
-DEVCONTAINER_CLI_VERSION="0.89.0"
-PRECOMMIT_VERSION="4.6.2"
+HADOLINT_VERSION="v2.15.1"
+ZMX_VERSION="1.0.1"
+PI_AGENT_VERSION="v1.5.0"
+BUN_VERSION="v1.4.4"
+OPENSPEC_VERSION="1.16.1"
+DEVCONTAINER_CLI_VERSION="0.90.0"
+PRECOMMIT_VERSION="4.7.0"
 
 case "$2" in
   aarch64-macos)
     DEVENV_SUFFIX="aarch64-macos"
     SHELLCHECK_ARCH="darwin.aarch64"
-    HADOLINT_SUFFIX="Darwin-arm64"
-    LLAMA_SUFFIX="macos-arm64"
+    HADOLINT_SUFFIX="macos-arm64"
     ZMX_SUFFIX="macos-aarch64"
     PI_AGENT_SUFFIX="darwin-arm64"
     BUN_SUFFIX="darwin-aarch64"
@@ -31,8 +29,7 @@ case "$2" in
   aarch64-linux)
     DEVENV_SUFFIX="aarch64-linux"
     SHELLCHECK_ARCH="linux.aarch64"
-    HADOLINT_SUFFIX="Linux-arm64"
-    LLAMA_SUFFIX="ubuntu-arm64"
+    HADOLINT_SUFFIX="linux-arm64"
     ZMX_SUFFIX="linux-aarch64"
     PI_AGENT_SUFFIX="linux-arm64"
     BUN_SUFFIX="linux-aarch64"
@@ -40,8 +37,7 @@ case "$2" in
   x86_64-linux)
     DEVENV_SUFFIX="x86_64-linux"
     SHELLCHECK_ARCH="linux.x86_64"
-    HADOLINT_SUFFIX="Linux-x86_64"
-    LLAMA_SUFFIX="ubuntu-x64"
+    HADOLINT_SUFFIX="linux-x86_64"
     ZMX_SUFFIX="linux-x86_64"
     PI_AGENT_SUFFIX="linux-x64"
     BUN_SUFFIX="linux-x64"
@@ -84,9 +80,15 @@ curl -Ls "https://zmx.sh/a/zmx-${ZMX_VERSION}-${ZMX_SUFFIX}.tar.gz" | tar xfz - 
 progress "pi-agent ${PI_AGENT_VERSION}"
 curl -sL "https://github.com/earendil-works/pi/releases/download/${PI_AGENT_VERSION}/pi-${PI_AGENT_SUFFIX}.tar.gz" | tar xfz - -C "$DESTDIR"
 
-progress "llama.cpp ${LLAMA_VERSION}"
-mkdir -p "$DESTDIR"/llama.cpp
-curl -Ls "https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_VERSION}/llama-${LLAMA_VERSION}-bin-${LLAMA_SUFFIX}.tar.gz" | tar xfz - --strip=1 -C "$DESTDIR"/llama.cpp
+progress "pi agent settings (npmCommand=bun)"
+mkdir -p "$DESTDIR"/.pi
+if [[ ! -f "$DESTDIR"/.pi/settings.json ]]; then
+  cat > "$DESTDIR"/.pi/settings.json <<'EOF'
+{
+  "npmCommand": ["bun"]
+}
+EOF
+fi
 
 progress "bun ${BUN_VERSION}"
 curl -Ls "https://github.com/oven-sh/bun/releases/download/bun-${BUN_VERSION}/bun-${BUN_SUFFIX}.zip" | tar xf - --strip=1 -C "$DESTDIR"/bin
@@ -144,7 +146,7 @@ echo "Add the following line to ~/.bashrc"
 echo "  source $DESTDIR/devenv_tools.bash"
 echo "Add the following line to ~/.config/nvim/init.lua"
 echo "  require('devenv_config')"
-echo "Consider installing"
+echo "Consider installing pi extensions"
 echo "  pi install npm:pi-subagents"
 echo "  pi install npm:@sting8k/pi-vcc"
 echo "  pi install npm:@sting8k/pi-droid-styling"

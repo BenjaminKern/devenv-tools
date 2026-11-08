@@ -26,13 +26,16 @@ goto :eof
 
 :clink
 rem Prepend custom tools to PATH
-set PATH=%BASE%bin;%BASE%nvim-win64\bin;%BASE%mingit\cmd;%BASE%clink;%BASE%busybox;%BASE%zig;%PATH%
+set PATH=%BASE%bin;%BASE%pi;%BASE%nvim-win64\bin;%BASE%mingit\cmd;%BASE%clink;%BASE%busybox;%BASE%zig;%PATH%
 set "CLINK_PATH=%BASE%clink\scripts"
 
 rem Git config
 set "GIT_CONFIG_COUNT=1"
 set "GIT_CONFIG_KEY_0=include.path"
 set "GIT_CONFIG_VALUE_0=%BASE%gitconfig"
+
+rem Pi agent directory
+set "PI_CODING_AGENT_DIR=%BASE%.pi"
 
 rem Editor and FZF
 set "EDITOR=nvim"

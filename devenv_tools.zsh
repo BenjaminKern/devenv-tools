@@ -8,7 +8,6 @@ if [[ ! -f "$devenv_tools_dir/devenv_tools.zsh" ]]; then
 fi
 
 PATH="$devenv_tools_dir/bin:$PATH"
-[[ -d "$devenv_tools_dir/llama.cpp" ]] && PATH="$devenv_tools_dir/llama.cpp:$PATH"
 [[ -d "$devenv_tools_dir/pi" ]] && PATH="$devenv_tools_dir/pi:$PATH"
 export PATH
 

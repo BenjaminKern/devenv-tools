@@ -127,7 +127,7 @@ jobs:
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/devenv/{bin,lib,licenses}
           mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{yq,dive,actionlint,age,shfmt,fzf,buildifier,buildozer,bazelisk,vhs,oh-my-posh,neovim,llvm,lldb,gontlm-proxy,bottom}
-          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,hexyl,typos,just,difftastic,tokei,zmx}
+          mkdir -p "$GITHUB_WORKSPACE"/devenv/licenses/{clang-tools-extra,dust,fd,rg,uv,ruff,hyperfine,bat,sd,lsd,zoxide,delta,watchexec,stylua,hexyl,typos,just,difftastic,tokei,zmx,herdr}
           cp {devenv_tools.bash,devenv_tools.zsh,devenv_tools.bat} "$GITHUB_WORKSPACE"/devenv
           curl -Ls https://raw.githubusercontent.com/ClementTsang/bottom/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/bottom/LICENSE
           curl -Ls https://raw.githubusercontent.com/bdwyertech/gontlm-proxy/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/gontlm-proxy/LICENSE
@@ -174,6 +174,7 @@ jobs:
           curl -Ls https://raw.githubusercontent.com/XAMPPRocky/tokei/refs/heads/master/LICENCE-MIT -o "$GITHUB_WORKSPACE"/devenv/licenses/tokei/LICENCE-MIT
           curl -Ls https://raw.githubusercontent.com/XAMPPRocky/tokei/refs/heads/master/LICENCE-APACHE -o "$GITHUB_WORKSPACE"/devenv/licenses/tokei/LICENCE-APACHE
           curl -Ls https://raw.githubusercontent.com/neurosnap/zmx/refs/heads/main/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/zmx/LICENSE
+          curl -Ls https://raw.githubusercontent.com/herdrdev/herdr/refs/heads/master/LICENSE -o "$GITHUB_WORKSPACE"/devenv/licenses/herdr/LICENSE
       - uses: actions/setup-go@v7
         if: ${{ !matrix.image }}
         with:
@@ -205,7 +206,7 @@ jobs:
           git clone --depth 1 https://github.com/neovim/neovim.git neovim-src
           git clone --depth 1 https://github.com/bdwyertech/gontlm-proxy.git gontlm-proxy-src
           git clone --depth 1 https://github.com/Kitware/CMake.git cmake-src
-          git clone --branch llvmorg-23.1.1 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
+          git clone --branch llvmorg-23.1.5 --depth 1 https://github.com/llvm/llvm-project.git llvm-src
       - name: Build oh-my-posh
         if: ${{ matrix.os != 'windows-2022' }}
         run: |
@@ -271,10 +272,11 @@ jobs:
           cargo install just
           cargo install difftastic
           cargo install tokei
+          cargo install herdr --git https://github.com/herdrdev/herdr --tag v0.9.5
       - name: Add rust tools
         shell: bash
         run: |
-          cp ${{ matrix.cargo_tool_prefix }}/bin/{dust,fd,rg,uv,uvx,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm,just,difft,tokei}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
+          cp ${{ matrix.cargo_tool_prefix }}/bin/{dust,fd,rg,uv,uvx,hyperfine,bat,sd,lsd,zoxide,delta,stylua,hexyl,typos,btm,just,difft,tokei,herdr}${{ matrix.extension }} "$GITHUB_WORKSPACE"/devenv/bin
       - name: Add ruff
         if: ${{ matrix.os != 'windows-2022' }}
         shell: bash
