@@ -251,15 +251,26 @@ jobs:
           echo "RUSTFLAGS=-Clink-arg=-fuse-ld=lld" >> "$GITHUB_ENV"
           echo "CC=clang" >> "$GITHUB_ENV"
           echo "CXX=clang++" >> "$GITHUB_ENV"
-      # herdr vendors libghostty-vt, whose build.rs shells out to zig.
-      # Keep this in sync with ZIG_VERSION in ci-images/.github/workflows/docker-image.yml
-      # so every platform builds against the same compiler; the linux container
-      # image already ships it, so only the bare macOS/Windows runners install it.
+      # herdr vendors libghostty-vt, and its build.zig requires zig 0.16.x exactly:
+      # vendor/libghostty-vt/src/build/zig.zig compares major and minor for equality,
+      # so 0.17.x fails to compile. Install 0.16.0 on every platform, including the
+      # linux containers, because the ci-images image ships 0.17.0 at /usr/local/zig.
       - name: Install Zig
-        if: ${{ !matrix.image }}
         uses: xyzzylabs/setup-zig@2082e552e19803253444ed0f0124948d16e9a926 # v1.0.6
         with:
-          version: 0.17.0
+          version: 0.16.0
+      # Fail here rather than deep inside `cargo install herdr`, and pin the exact
+      # binary so the image's /usr/local/zig can never win the PATH lookup: herdr's
+      # crates/ghostty-vt/build.rs honours $ZIG and only falls back to `zig`.
+      - name: Verify Zig
+        shell: bash
+        run: |
+          zig version
+          case "$(zig version)" in
+            0.16.*) ;;
+            *) echo "expected zig 0.16.x, got $(zig version) ($(command -v zig))"; exit 1 ;;
+          esac
+          echo "ZIG=$(command -v zig)" >> "$GITHUB_ENV"
       - name: Rust tools
         run: |
           echo "$RUSTFLAGS"
